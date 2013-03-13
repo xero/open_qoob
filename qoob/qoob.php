@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.06
+ * @version 	2.072
  */
 class qoob {
 	/**
@@ -102,6 +102,28 @@ class qoob {
 		return @constant('self::HTTP_'.$code);
 	}
 	/**
+	 * config
+	 * parse a php ini into the library
+	 * @param string $file file name
+	 */
+	function config($file) {
+		if(!file_exists($file)) {
+			throw new Exception(sprintf(self::E_Loading, $file), 500);	
+		} 
+		$ini = parse_ini_file($file, true);
+		if(count($ini)>0) {
+			foreach ($ini as $key => $val) {
+				if(is_array($val)) {
+					foreach ($val as $k => $v) {
+						library::set('CONFIG.'.strtoupper($key).'.'.$k, $v);
+					}
+				} else {
+					library::set('CONFIG.'.$key, $val);
+				}
+			}
+		}
+	}
+	/**
 	 * load
 	 * load namespace aware classes into the framework
 	 * @param string $class class name
@@ -113,8 +135,8 @@ class qoob {
 			$name = $name[count($name)-1];
 			if(!library::get($name)) {
 				// create class and set a reference to it
-				library::set($name, new $class);
-				$this->$name = library::get($name);
+				library::set('CLASS.'.$name, new $class);
+				$this->$name = library::get('CLASS.'.$name);
 			}
 		} else {
 			throw new Exception(sprintf(self::E_Loading, $class), 500);			
@@ -143,7 +165,7 @@ class qoob {
 				throw new Exception(sprintf(self::E_Request, $type), 500);
 			}
 			library::set(
-				'routes', 
+				'ROUTES', 
 				array(
 					'verb' => strtoupper($verb),
 					'type' => $type,
@@ -160,18 +182,18 @@ class qoob {
 	function parseRoutes() {
 		$this->benchmark->mark('parseStart');
     	$verb = $_SERVER['REQUEST_METHOD'];
-    	library::set('url', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-    	library::set('domain', 'http://'.dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"]));
-    	library::set('uri', rtrim(str_replace(library::get('domain'), '', library::get('url')), '/'));
-    	library::set('ajax', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
+    	library::set('QOOB.url', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+    	library::set('QOOB.domain', 'http://'.dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"]));
+    	library::set('REQUEST.uri', rtrim(str_replace(library::get('QOOB.domain'), '', library::get('QOOB.url')), '/'));
+    	library::set('REQUEST.ajax', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
     	$found = false;
-		foreach(library::get('routes') as  $route) {
+		foreach(library::get('ROUTES') as  $route) {
 			// regular expression to identify uri requests formatted like '/users/:uid/posts/:pid'
 			$pattern = "@^".preg_replace('/\\\:[a-zA-Z0-9\_\-]+/', '([a-zA-Z0-9\-\_]+)', preg_quote($route['pattern']))."$@D";
 			$args = array();
 			// check if the current request matches the expression
-			if($verb == $route['verb'] && preg_match($pattern, library::get('uri'), $matches)) {
-				if($route['type'] == library::get('ajax')) {
+			if($verb == $route['verb'] && preg_match($pattern, library::get('REQUEST.uri'), $matches)) {
+				if($route['type'] == library::get('REQUEST.ajax')) {
 					// remove the first match
 					array_shift($matches);
 					$found = true;
@@ -264,10 +286,10 @@ class qoob {
 	 * @return class qoob
 	 */
 	static function open() {
-		if (!library::exists($class=__CLASS__)) {
-			library::set($class, new $class);
+		if (!library::exists('CLASS.'.$class=__CLASS__)) {
+			library::set('CLASS.'.$class, new $class);
 		}
-		return library::get($class);
+		return library::get('CLASS.'.$class);
 	}
 	/**
 	 * clone

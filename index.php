@@ -1,7 +1,11 @@
 <?php
-//framework init
-$qoob = require('/qoob/qoob.php');
-
+//______________________________________________________________________________
+//                                                                framework init
+$qoob = require('qoob/qoob.php');
+// load a config file
+$qoob->config('qoob/api/config.ini.php');
+//______________________________________________________________________________
+//                                                                    add routes
 // closure style callbacks 
 $qoob->route('GET /', function() {
 	echo '<h1>open qoob</h1><p>this is the default page.</p>';
@@ -15,7 +19,7 @@ $qoob->route('GET /date/:month/:day/:year', 'test->dating');
 // callbacks with different request methods
 $qoob->route('GET /home [sync]', 'request_types->sync');
 $qoob->route('GET /home [ajax]', 'request_types->ajax');
-
-//run
+//______________________________________________________________________________
+//                                                                       execute
 $qoob->run();
 ?>
