@@ -5,9 +5,104 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.001
+ * @version 	2.005
  */
 class qoob {
+	/**
+	 * split
+	 * seperate a comma, semi-colon, or pipe delimited string
+	 * @param string $str
+	 * @param array $strs
+	 */
+	function split($str) {
+		return array_map('trim',
+			preg_split('/[,;|]/',$str,0,PREG_SPLIT_NO_EMPTY));
+	}
+	/**
+	 * route
+	 * add a route pattern
+	 * @param string $pattern route
+	 * @param mixed $handler closure function or class->method reference
+	 */
+	function route($pattern, $handler) {
+		if(empty($handler)) {
+			die('missing callback');
+		}
+		$parts = explode(' ', trim($pattern));
+		foreach ($this->split($parts[0]) as $verb) {
+			if (!preg_match('/GET|HEAD|POST|PUT|PATCH|DELETE|CONNECT/', strtoupper($verb))) {
+				die(sprintf('not implemented: %s', $verb));
+			}
+			if(!isset($parts[1])) {
+				die(sprintf('invalid routing pattern: %s', $pattern));
+			}
+			library::set(
+				'routes', 
+				array(
+					'verb' => strtoupper($verb),
+					'handler' => $handler,
+					'pattern' => rtrim($parts[1], '/')
+				)
+			);
+		}		
+	}	
+	/**
+	 * parse routes
+	 * mine the current request against the routes in the library
+	 */
+	function parseRoutes() {
+		$this->benchmark->mark('parseStart');
+    	$verb = $_SERVER['REQUEST_METHOD'];
+    	library::set('url', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+    	library::set('domain', 'http://'.dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"]));
+    	library::set('uri', rtrim(str_replace(library::get('domain'), '', library::get('url')), '/'));
+    	library::set('AJAX', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
+    	$found = false;
+		foreach(library::get('routes') as  $route) {
+			// convert uris like '/users/:uid/posts/:pid' to regular expression
+			$pattern = "@^".preg_replace('/\\\:[a-zA-Z0-9\_\-]+/', '([a-zA-Z0-9\-\_]+)', preg_quote($route['pattern']))."$@D";
+			$args = array();
+			// check if the current request matches the expression
+			if($verb == $route['verb'] && preg_match($pattern, library::get('uri'), $matches)) {
+				// remove the first match
+				array_shift($matches);
+				$found = true;
+				// correlate route regex with uri parameters
+				preg_match_all('/\\\:[a-zA-Z0-9\_\-]+/', preg_quote($route['pattern']), $names);
+				for($i=0;$i<count($names[0]);$i++) {
+					$args[str_replace('\:', '', $names[0][$i])] = isset($matches[$i])?$matches[$i]:'';
+				}
+				break;
+			}
+		}
+		$this->benchmark->mark('parseEnd');		
+		if(!$found) {
+			die('404 file not found');
+		} else {
+			$this->call($route, $args);
+		}
+	}
+	/**
+	 * call
+	 * execute a route handler
+	 * @param array $route route information
+	 * @param array $args url arguments
+	 */
+	function call($route, $args) {
+		$this->benchmark->mark('callStart');
+		//closure style
+		if(is_callable($route['handler'])) {
+			call_user_func_array($route['handler'], array($args));
+		}
+		//class creation
+		if(is_string($route['handler']) && preg_match('/(.+)\h*(->|::)\h*(.+)/s', $route['handler'], $parts)) {
+			if (!class_exists($parts[1]) || !method_exists($parts[1], $parts[3])) {
+				die('404 file not found');
+			}
+			call_user_func_array(array(new $parts[1], $parts[3]), array($args));
+		}
+		$this->benchmark->mark('callEnd');
+	}
 	/**
 	 * load
 	 * load namespace aware classes into the framework
