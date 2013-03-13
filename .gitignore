@@ -1,5 +1,6 @@
 *.log
-test/logs/*.*
+!tmp/.htaccess
+tmp/*.*
 .DS_STORE
 .DS_STORE?
 ._*
