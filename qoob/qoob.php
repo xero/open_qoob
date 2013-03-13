@@ -15,10 +15,11 @@ class qoob {
 		E_Handler='Missing Callback',
 		E_Pattern='Invalid routing pattern: %s',
 		E_Fatal='Fatal error: %s',
-		E_Open='Unable to open %s',
+		E_Open='Unable to open: %s',
+		E_Loading='Failed loading: %s',
 		E_Request='Invalid reqest type: %s',
 		E_Routes='No routes specified',
-		E_Method='Invalid method %s',
+		E_Method='Invalid method: %s',
 		E_Gateway='Not implemented: %s';
 	/**
 	 * request types
@@ -92,6 +93,9 @@ class qoob {
 	 * @return string status message
 	 */
 	function status($code) {
+		// account for system thrown exceptions
+		$code = $code>0 ? $code : 500;
+		// no commandline headers
 		if (PHP_SAPI!='cli') {
 			header('HTTP/1.1 '.$code);
 		}
@@ -112,6 +116,8 @@ class qoob {
 				library::set($name, new $class);
 				$this->$name = library::get($name);
 			}
+		} else {
+			throw new Exception(sprintf(self::E_Loading, $class), 500);			
 		}
 	}
 	/**
@@ -232,6 +238,7 @@ class qoob {
 	function exception_handler($exc) {
 		$code = $exc->getCode();
 		$msg = $exc->getMessage();
+		$this->status($code);
 		/**
 		  * @todo respond in the correct context
 		  */
@@ -248,6 +255,7 @@ class qoob {
 	 * @param array $ctx error context
 	 */	
 	function error_handler($num, $str, $file, $line, $ctx) {
+		$this->status($num);
 		die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>num: '.$num.'<br/>str: '.$str.'<br/>file: '.$file.'<br/>line: '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
 	}
 	/**
