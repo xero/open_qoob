@@ -1,22 +1,118 @@
-<?
+<?php
 /**
  * open qoob framework
  *
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.0057
+ * @version 	2.06
  */
 class qoob {
 	/**
-	 * split
-	 * seperate a comma, semi-colon, or pipe delimited string
-	 * @param string $str
-	 * @param array $strs
+	 * error constants
 	 */
-	function split($str) {
-		return array_map('trim',
-			preg_split('/[,;|]/',$str,0,PREG_SPLIT_NO_EMPTY));
+	const
+		E_Handler='Missing Callback',
+		E_Pattern='Invalid routing pattern: %s',
+		E_Fatal='Fatal error: %s',
+		E_Open='Unable to open %s',
+		E_Request='Invalid reqest type: %s',
+		E_Routes='No routes specified',
+		E_Method='Invalid method %s',
+		E_Gateway='Not implemented: %s';
+	/**
+	 * request types
+	 */
+	const
+		REQUESTS='SYNC|AJAX';
+	/**
+	 * http verbs
+	 */
+	const
+		VERBS='GET|HEAD|POST|PUT|PATCH|DELETE|CONNECT';
+	/**
+	 * http status codes
+	 * @see http://www.rfc-editor.org/rfc/rfc2616.txt 
+	 */
+	const
+		//--- informational
+		HTTP_100='Continue',
+		HTTP_101='Switching Protocols',
+		//--- successful
+		HTTP_200='OK',
+		HTTP_201='Created',
+		HTTP_202='Accepted',
+		HTTP_203='Non-Authorative Information',
+		HTTP_204='No Content',
+		HTTP_205='Reset Content',
+		HTTP_206='Partial Content',
+		//--- redirection
+		HTTP_300='Multiple Choices',
+		HTTP_301='Moved Permanently',
+		HTTP_302='Found',
+		HTTP_303='See Other',
+		HTTP_304='Not Modified',
+		HTTP_305='Use Proxy',
+		HTTP_307='Temporary Redirect',
+		//--- client error
+		HTTP_400='Bad Request',
+		HTTP_401='Unauthorized',
+		HTTP_402='Payment Required',
+		HTTP_403='Forbidden',
+		HTTP_404='Not Found',
+		HTTP_405='Method Not Allowed',
+		HTTP_406='Not Acceptable',
+		HTTP_407='Proxy Authentication Required',
+		HTTP_408='Request Timeout',
+		HTTP_409='Conflict',
+		HTTP_410='Gone',
+		HTTP_411='Length Required',
+		HTTP_412='Precondition Failed',
+		HTTP_413='Request Entity Too Large',
+		HTTP_414='Request-URI Too Long',
+		HTTP_415='Unsupported Media Type',
+		HTTP_416='Requested Range Not Satisfiable',
+		HTTP_417='Exception Failed',
+		//--- server error
+		HTTP_500='Internal Server Error',
+		HTTP_501='Not Implemented',
+		HTTP_502='Bad Gateway',
+		HTTP_503='Service Unavailable',
+		HTTP_504='Gateway Timeout',
+		HTTP_505='HTTP Version Not Supported';
+	/**
+	 * internal variables
+	 */
+	private 
+		$debug;
+	/**
+	 * status
+	 * echo http header and return status message
+	 * @param int $code status code
+	 * @return string status message
+	 */
+	function status($code) {
+		if (PHP_SAPI!='cli') {
+			header('HTTP/1.1 '.$code);
+		}
+		return @constant('self::HTTP_'.$code);
+	}
+	/**
+	 * load
+	 * load namespace aware classes into the framework
+	 * @param string $class class name
+	 */
+	function load($class) {
+		if(class_exists($class)) {
+			// remove namespace from class name
+			$name = explode('\\', $class);
+			$name = $name[count($name)-1];
+			if(!library::get($name)) {
+				// create class and set a reference to it
+				library::set($name, new $class);
+				$this->$name = library::get($name);
+			}
+		}
 	}
 	/**
 	 * route
@@ -26,19 +122,19 @@ class qoob {
 	 */
 	function route($pattern, $handler) {
 		if(empty($handler)) {
-			die('missing callback');
+			throw new Exception($self::E_Handler, 500);
 		}
 		$parts = explode(' ', trim($pattern));
 		foreach ($this->split($parts[0]) as $verb) {
-			if (!preg_match('/GET|HEAD|POST|PUT|PATCH|DELETE|CONNECT/', strtoupper($verb))) {
-				die(sprintf('not implemented: %s', $verb));
+			if (!preg_match('/'.self::VERBS.'/', strtoupper($verb))) {
+				throw new Exception(sprintf(self::E_Gateway, $verb), 500);
 			}
 			if(!isset($parts[1])) {
-				die(sprintf('invalid routing pattern: %s', $pattern));
+				throw new Exception(sprintf(self::E_Pattern, $pattern), 500);
 			}
 			$type = isset($parts[2])?str_replace(array('[',']'), '', strtoupper($parts[2])):'SYNC';
-			if (!preg_match('/SYNC|AJAX/', $type)) {
-				die(sprintf('invalid request type: %s', $type));
+			if (!preg_match('/'.self::REQUESTS.'/', $type)) {
+				throw new Exception(sprintf(self::E_Request, $type), 500);
 			}
 			library::set(
 				'routes', 
@@ -49,7 +145,7 @@ class qoob {
 					'pattern' => rtrim($parts[1], '/')
 				)
 			);
-		}
+		}		
 	}
 	/**
 	 * parse routes
@@ -64,12 +160,12 @@ class qoob {
     	library::set('ajax', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
     	$found = false;
 		foreach(library::get('routes') as  $route) {
-			// convert uris like '/users/:uid/posts/:pid' to regular expression
+			// regular expression to identify uri requests formatted like '/users/:uid/posts/:pid'
 			$pattern = "@^".preg_replace('/\\\:[a-zA-Z0-9\_\-]+/', '([a-zA-Z0-9\-\_]+)', preg_quote($route['pattern']))."$@D";
 			$args = array();
 			// check if the current request matches the expression
 			if($verb == $route['verb'] && preg_match($pattern, library::get('uri'), $matches)) {
-				if($route['type'] == library::get('ajax')) {				
+				if($route['type'] == library::get('ajax')) {
 					// remove the first match
 					array_shift($matches);
 					$found = true;
@@ -78,13 +174,13 @@ class qoob {
 					for($i=0;$i<count($names[0]);$i++) {
 						$args[str_replace('\:', '', $names[0][$i])] = isset($matches[$i])?$matches[$i]:'';
 					}
-					break;
+					break;					
 				}
 			}
 		}
 		$this->benchmark->mark('parseEnd');		
 		if(!$found) {
-			die('404 file not found');
+			throw new Exception(self::HTTP_404, 404);
 		} else {
 			$this->call($route, $args);
 		}
@@ -104,29 +200,56 @@ class qoob {
 		//class creation
 		if(is_string($route['handler']) && preg_match('/(.+)\h*(->|::)\h*(.+)/s', $route['handler'], $parts)) {
 			if (!class_exists($parts[1]) || !method_exists($parts[1], $parts[3])) {
-				die('404 file not found');
+				throw new Exception(self::HTTP_404, 404);
 			}
 			call_user_func_array(array(new $parts[1], $parts[3]), array($args));
 		}
 		$this->benchmark->mark('callEnd');
 	}
 	/**
-	 * load
-	 * load namespace aware classes into the framework
-	 * @param string $class class name
+	 * run
+	 * begin framework execution
 	 */
-	function load($class) {
-		if(class_exists($class)) {
-			// remove namespace from class name
-			$name = explode('\\', $class);
-			$name = $name[count($name)-1];
-			if(!library::get($name)) {
-				// create class and set a reference to it
-				library::set($name, new $class);
-				$this->$name = library::get($name);
-			}
-		}
-	}	
+	function run() {
+		$this->parseRoutes();
+	}
+	/**
+	 * split
+	 * seperate a comma, semi-colon, or pipe delimited string
+	 * @param string $str
+	 * @param array $strs
+	 */
+	function split($str) {
+		return array_map('trim',
+			preg_split('/[,;|]/',$str,0,PREG_SPLIT_NO_EMPTY));
+	}
+	/**
+	 * exception handler
+	 * gracefully respond to exceptions.
+	 *
+	 * @param object $exc the php exception object
+	 */
+	function exception_handler($exc) {
+		$code = $exc->getCode();
+		$msg = $exc->getMessage();
+		/**
+		  * @todo respond in the correct context
+		  */
+		die("<h1>open qoob</h1><h3>exception: ".$code."!</h3><p>".$msg."</p>");
+	}
+	/**
+	 * error handler
+	 * gracefully respond to errors
+	 *
+	 * @param int $num error code
+	 * @param string $str error message
+	 * @param string $file the file throwing the error
+	 * @param int $line line number in the file throwing the error
+	 * @param array $ctx error context
+	 */	
+	function error_handler($num, $str, $file, $line, $ctx) {
+		die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>num: '.$num.'<br/>str: '.$str.'<br/>file: '.$file.'<br/>line: '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
+	}
 	/**
 	 * open qoob
 	 * get the singleton reference to the open qoob framework
@@ -149,6 +272,8 @@ class qoob {
 	 * bootstraps the framework. initializes autoloading classes.
 	 */
 	private function __construct() {
+		set_error_handler(array(&$this, 'error_handler'));
+		set_exception_handler(array(&$this, 'exception_handler'));
 		set_include_path(
 			implode(
 				PATH_SEPARATOR, 

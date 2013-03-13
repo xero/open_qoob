@@ -17,5 +17,5 @@ $qoob->route('GET /home [sync]', 'request_types->sync');
 $qoob->route('GET /home [ajax]', 'request_types->ajax');
 
 //run
-$qoob->parseRoutes();
+$qoob->run();
 ?>
