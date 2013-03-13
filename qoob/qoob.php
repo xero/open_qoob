@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.005
+ * @version 	2.0057
  */
 class qoob {
 	/**
@@ -36,16 +36,21 @@ class qoob {
 			if(!isset($parts[1])) {
 				die(sprintf('invalid routing pattern: %s', $pattern));
 			}
+			$type = isset($parts[2])?str_replace(array('[',']'), '', strtoupper($parts[2])):'SYNC';
+			if (!preg_match('/SYNC|AJAX/', $type)) {
+				die(sprintf('invalid request type: %s', $type));
+			}
 			library::set(
 				'routes', 
 				array(
 					'verb' => strtoupper($verb),
+					'type' => $type,
 					'handler' => $handler,
 					'pattern' => rtrim($parts[1], '/')
 				)
 			);
-		}		
-	}	
+		}
+	}
 	/**
 	 * parse routes
 	 * mine the current request against the routes in the library
@@ -56,7 +61,7 @@ class qoob {
     	library::set('url', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
     	library::set('domain', 'http://'.dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"]));
     	library::set('uri', rtrim(str_replace(library::get('domain'), '', library::get('url')), '/'));
-    	library::set('AJAX', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
+    	library::set('ajax', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
     	$found = false;
 		foreach(library::get('routes') as  $route) {
 			// convert uris like '/users/:uid/posts/:pid' to regular expression
@@ -64,15 +69,17 @@ class qoob {
 			$args = array();
 			// check if the current request matches the expression
 			if($verb == $route['verb'] && preg_match($pattern, library::get('uri'), $matches)) {
-				// remove the first match
-				array_shift($matches);
-				$found = true;
-				// correlate route regex with uri parameters
-				preg_match_all('/\\\:[a-zA-Z0-9\_\-]+/', preg_quote($route['pattern']), $names);
-				for($i=0;$i<count($names[0]);$i++) {
-					$args[str_replace('\:', '', $names[0][$i])] = isset($matches[$i])?$matches[$i]:'';
+				if($route['type'] == library::get('ajax')) {				
+					// remove the first match
+					array_shift($matches);
+					$found = true;
+					// correlate route regex with uri parameters
+					preg_match_all('/\\\:[a-zA-Z0-9\_\-]+/', preg_quote($route['pattern']), $names);
+					for($i=0;$i<count($names[0]);$i++) {
+						$args[str_replace('\:', '', $names[0][$i])] = isset($matches[$i])?$matches[$i]:'';
+					}
+					break;
 				}
-				break;
 			}
 		}
 		$this->benchmark->mark('parseEnd');		

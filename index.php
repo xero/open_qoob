@@ -12,6 +12,9 @@ $qoob->route('GET /home/:sometime', function($args) {
 // class->method style callbacks
 $qoob->route('GET /things/going', 'test->blah');
 $qoob->route('GET /date/:month/:day/:year', 'test->dating');
+// callbacks with different request methods
+$qoob->route('GET /home [sync]', 'request_types->sync');
+$qoob->route('GET /home [ajax]', 'request_types->ajax');
 
 //run
 $qoob->parseRoutes();
