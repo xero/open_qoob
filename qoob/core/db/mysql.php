@@ -47,18 +47,29 @@ class mysql {
 
     /**
      * initializer
-     * set the database connection variables
+     * set the database connection variables and optionally the asciiOnly variable
      *
      * @param string $db_host
      * @param string $db_user
      * @param string $db_pass
-     * @param string $db_name     
+     * @param string $db_name  
+     * @param boolean $asciiOnly default = true
      */
-    public function init($db_host, $db_user, $db_pass, $db_name) {
+    public function init($db_host, $db_user, $db_pass, $db_name, $asciiOnly=true) {
         $this->dbhost = $db_host;
         $this->dbuser = $db_user;
         $this->dbpass = $db_pass;
         $this->dbname = $db_name;
+        $this->asciiOnly = $asciiOnly;
+    }
+    /**
+     * is ascii
+     * set the asciiOnly variable to true and allow only ascii characters in sql queries, false will allow all printable characters.
+     *
+     * @param boolean $asciiOnly default = true
+     */
+    public function isAscii($asciiOnly) {
+        $this->asciiOnly = $asciiOnly;
     }
     /**
      * connect
@@ -125,7 +136,7 @@ class mysql {
             $clean[$key] = $this->sanitize($value);
         }
         $this->sql = preg_replace($find, $clean, $sql);
-        $query = new mysqlquery($this->sql, $this->db);
+        $query = new mysqlQuery($this->sql, $this->db);
         if($results) {
             return $query->result();
         } else {
@@ -156,7 +167,7 @@ class mysql {
  * 
  *
  */
-class mysqlquery {
+class mysqlQuery {
     protected $result;
     private $link = null;
     
