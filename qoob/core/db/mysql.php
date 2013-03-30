@@ -3,10 +3,10 @@
  * mysql
  * adapter for connecting to mysql database servers. sql queries are automatically sanitized for injection protection.
  * 
- * @author 		xero harrison <x@xero.nu>
- * @copyright 	creative commons attribution-shareAlike 3.0 unported
- * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.41
+ * @author      xero harrison <x@xero.nu>
+ * @copyright   creative commons attribution-shareAlike 3.0 unported
+ * @license     http://creativecommons.org/licenses/by-sa/3.0/ 
+ * @version     2.41
  */
 namespace qoob\core\db;
 class mysql {
@@ -19,7 +19,7 @@ class mysql {
     /**
      * @var string $dbhost the database hostname
      */
-	private $dbhost;
+    private $dbhost;
     /**
      * @var string $dbuser the database username
      */
@@ -40,6 +40,10 @@ class mysql {
      * @var string $sql the sql query
      */    
     protected $sql = null;
+    /**
+     * @var bool $asciiOnly true will allow only ascii characters, false will allow all printable characters
+     */
+    private $asciiOnly = true;
 
     /**
      * initializer
@@ -51,10 +55,10 @@ class mysql {
      * @param string $db_name     
      */
     public function init($db_host, $db_user, $db_pass, $db_name) {
-    	$this->dbhost = $db_host;
-    	$this->dbuser = $db_user;
-    	$this->dbpass = $db_pass;
-    	$this->dbname = $db_name;
+        $this->dbhost = $db_host;
+        $this->dbuser = $db_user;
+        $this->dbpass = $db_pass;
+        $this->dbname = $db_name;
     }
     /**
      * connect
@@ -62,7 +66,7 @@ class mysql {
      */
     public function connect() {
         if(($db = @mysql_connect($this->dbhost, $this->dbuser, $this->dbpass)) === false) {
-        	throw new dbException(sprintf(self::E_Server, $this->dbuser.'@'.$this->dbhost));
+            throw new dbException(sprintf(self::E_Server, $this->dbuser.'@'.$this->dbhost));
         }
         
         if((@mysql_select_db($this->dbname, $db)) === false) {
@@ -81,16 +85,16 @@ class mysql {
      * @param boolean $closeOld
      */
     public function reconnect($db_host, $db_user, $db_pass, $db_name, $closeOld=true) {
-    	if($closeOld){
-	        mysql_close($this->db);
-    	}
+        if($closeOld){
+            mysql_close($this->db);
+        }
         $this->init($db_host, $db_user, $db_pass, $db_name);
         $this->connect();
     }
 
     /**
      * sanitize
-     * injection attack protection by removing non-ascii characters
+     * mitigate attack vectors by removing offending slashes, removing non printable characters, and filtering it against the mysql server's own escape function.
      * 
      * @param string $string
      * @return string
@@ -99,10 +103,9 @@ class mysql {
         if(get_magic_quotes_gpc()) {
             $string = stripslashes($string);
         }
-        //remove non-ascii characters (except new lines)
-        $filtered = trim(preg_replace('/[^\x0A\x0D\x20-\x7E]/', '', $string));
+        $filtered = $this->asciiOnly ? trim(preg_replace('/[^\x0A\x0D\x20-\x7E]/', '', $string)) : trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $string));
         return mysql_real_escape_string($filtered);
-	}
+    }
     
     /**
      * SQL query function
@@ -117,17 +120,17 @@ class mysql {
      * @return object|boolean
      */
     public function query($sql, $find, $replace, $results = true) {
-		$clean = array();
-		foreach ($replace as $key => $value) {
-			$clean[$key] = $this->sanitize($value);
-		}
-		$this->sql = preg_replace($find, $clean, $sql);
-        $query = new mysqlQuery($this->sql, $this->db);
-    	if($results) {
-	        return $query->result();
-    	} else {
-    		return true;
-    	}
+        $clean = array();
+        foreach ($replace as $key => $value) {
+            $clean[$key] = $this->sanitize($value);
+        }
+        $this->sql = preg_replace($find, $clean, $sql);
+        $query = new mysqlquery($this->sql, $this->db);
+        if($results) {
+            return $query->result();
+        } else {
+            return true;
+        }
     }
     
     /**
@@ -153,7 +156,7 @@ class mysql {
  * 
  *
  */
-class mysqlQuery {
+class mysqlquery {
     protected $result;
     private $link = null;
     
@@ -178,7 +181,7 @@ class mysqlQuery {
      * @return array
      */
     public function result() {
-        $result = array();            	
+        $result = array();              
         while (($row = @mysql_fetch_assoc($this->result)) != false) {
             $result[] = $row;
         }
@@ -200,9 +203,9 @@ class mysqlQuery {
      * call's free result only if one has been created
      */
     public function __destruct() {
-    	if(is_array($this->result)) {
-        	@mysql_free_result($this->result);
-    	}
+        if(is_array($this->result)) {
+            @mysql_free_result($this->result);
+        }
     }
 }
 /**
@@ -210,16 +213,16 @@ class mysqlQuery {
  *
  */
 class dbException extends \Exception {
-	/**
-	 * constructor
-	 * sets the error code and message
-	 * 
-	 * @param string $message
-	 * @param int $code 500
-	 */
+    /**
+     * constructor
+     * sets the error code and message
+     * 
+     * @param string $message
+     * @param int $code 500
+     */
     public function __construct($message, $code = 500) {
-    	$this->code = $code;
-    	$this->message = mysql_error().PHP_EOL."<br/><br/>".PHP_EOL.$message;
+        $this->code = $code;
+        $this->message = mysql_error().PHP_EOL."<br/><br/>".PHP_EOL.$message;
     }
 }
 ?>
