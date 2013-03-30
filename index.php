@@ -3,7 +3,7 @@
 //                                                                framework init
 $qoob = require('qoob/qoob.php');
 // load a config file
-$qoob->config('qoob/api/config.ini.php');
+$qoob->config('qoob/app/config.ini.php');
 //______________________________________________________________________________
 //                                                                    add routes
 // closure style callbacks 
@@ -13,14 +13,14 @@ $qoob->route('GET /', function() {
 $qoob->route('GET /home/:sometime', function($args) {
 	echo '<h1>open qoob</h1><p>this is the home method.<h3>args:</h3><pre>'.print_r($args, true).'</pre></p>';
 });
-// class->method style callbacks
-$qoob->route('GET /things/going', 'test->blah');
-$qoob->route('GET /date/:month/:day/:year', 'test->dating');
-// callbacks with different request methods
+// class->method style callbacks (using namespaces)
+$qoob->route('GET /things/going', 'app\test->blah');
+$qoob->route('GET /date/:month/:day/:year', 'app\test->dating');
+// callbacks with different request methods (without namespaces)
 $qoob->route('GET /home [sync]', 'request_types->sync');
 $qoob->route('GET /home [ajax]', 'request_types->ajax');
 // database test
-$qoob->route('GET /mysql', 'test->dbtest');
+$qoob->route('GET /model', 'app\test->modelTest');
 //______________________________________________________________________________
 //                                                                       execute
 $qoob->run();

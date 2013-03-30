@@ -311,7 +311,7 @@ class qoob {
 				PATH_SEPARATOR, 
 				array(
 					get_include_path(), 
-					basename(__DIR__).DIRECTORY_SEPARATOR.'api'
+					basename(__DIR__).DIRECTORY_SEPARATOR.'app'
 				)
 			)
 		);
