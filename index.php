@@ -19,6 +19,8 @@ $qoob->route('GET /date/:month/:day/:year', 'test->dating');
 // callbacks with different request methods
 $qoob->route('GET /home [sync]', 'request_types->sync');
 $qoob->route('GET /home [ajax]', 'request_types->ajax');
+// database test
+$qoob->route('GET /mysql', 'test->dbtest');
 //______________________________________________________________________________
 //                                                                       execute
 $qoob->run();
