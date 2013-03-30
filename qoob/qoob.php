@@ -133,7 +133,7 @@ class qoob {
 			// remove namespace from class name
 			$name = explode('\\', $class);
 			$name = $name[count($name)-1];
-			if(!library::get($name)) {
+			if(!library::exists($name)) {
 				// create class and set a reference to it
 				library::set('CLASS.'.$name, new $class);
 				$this->$name = library::get('CLASS.'.$name);
