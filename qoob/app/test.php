@@ -14,7 +14,7 @@ class test {
 		$q->benchmark->mark('modelLoadStart');
 		$q->load('model\codeModel');
 		$q->benchmark->mark('modelLoadEnd');
-		
+
 		$result = $q->codeModel->listCode();
 		echo "<pre>".print_r($result, true)."</pre>";
 	}

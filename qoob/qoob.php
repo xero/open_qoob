@@ -266,6 +266,8 @@ class qoob {
 		/**
 		  * @todo respond in the correct context
 		  */
+		$this->logz->changeFile('error.log');
+		$this->logz->write('exception: '.$code.' - '.$msg);
 		die("<h1>open qoob</h1><h3>exception: ".$code."!</h3><p>".$msg."</p>");
 	}
 	/**
@@ -280,6 +282,8 @@ class qoob {
 	 */	
 	function error_handler($num, $str, $file, $line, $ctx) {
 		$this->status($num);
+		$this->logz->changeFile('error.log');
+		$this->logz->write('error: '.$num.' '.$str.' '.$file.' '.$line.' '.print_r($ctx, true));
 		die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>num: '.$num.'<br/>str: '.$str.'<br/>file: '.$file.'<br/>line: '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
 	}
 	/**
@@ -319,6 +323,9 @@ class qoob {
 		spl_autoload_register();
 		$this->load('qoob\utils\benchmark');
 		$this->benchmark->mark('appStart');
+		$this->load('qoob\utils\logz');
+		//die('<h1>path: '.realpath('tmp').'</h1>');
+		$this->logz->setup(realpath('tmp'), 'error.log');
 	}
 	/**
 	 * destructor
@@ -332,6 +339,8 @@ class qoob {
 			}
 		}
 		echo str_replace('Array', 'benchmarks', '<pre style="border:1px solid #333;background:#ccc;padding:20px">'.print_r($markers, true).'</pre>');
+		$this->logz->changeFile('benchmark.log');
+		$this->logz->write(json_encode($markers));
 	}
 }
 //_________________________________________________________________________

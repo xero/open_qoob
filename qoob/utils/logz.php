@@ -6,7 +6,7 @@
  * @author 		xero harrison / http://xero.nu
  * @copyright 	creative commons attribution-shareAlike 3.0 Unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	1.3
+ * @version 	1.4
  * @package		qoob
  * @subpackage	utils 
  */
@@ -53,13 +53,13 @@ class logz {
 	 * clear the log
 	 */
 	function clear() {
-		file_put_contents($this->dir.$this->file, '');
+		file_put_contents($this->dir.DIRECTORY_SEPARATOR.$this->file, '');
 	}
 	/**
 	 * delete the log
 	 */
 	function destroy() {
-		@unlink($this->dir.$this->file);
+		@unlink($this->dir.DIRECTORY_SEPARATOR.$this->file);
 	}
 	/**
 	 * write to log
@@ -69,7 +69,7 @@ class logz {
 	 */
 	function write($data, $dateFormat='r') {
 		file_put_contents(
-			$this->dir.$this->file, 
+			$this->dir.DIRECTORY_SEPARATOR.$this->file, 
 			date($dateFormat).' ['.$this->getIP().'] '.$data.PHP_EOL, 
 			FILE_APPEND | LOCK_EX
 		);
@@ -82,7 +82,7 @@ class logz {
 	 */
 	function read($lineNumber=1) {
 		$linecount = 1;
-		$handle = fopen($this->dir.$this->file, "r");
+		$handle = fopen($this->dir.DIRECTORY_SEPARATOR.$this->file, "r");
 		while(!feof($handle)){
 			$line = fgets($handle);
 			if($linecount == $lineNumber) {
@@ -112,7 +112,7 @@ class logz {
 	 */
 	function count() {
 		$linecount = 0;
-		$handle = fopen($this->dir.$this->file, "r");
+		$handle = fopen($this->dir.DIRECTORY_SEPARATOR.$this->file, "r");
 		while(!feof($handle)){
 			$line = fgets($handle);
 			$linecount++;
