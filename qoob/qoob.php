@@ -129,6 +129,8 @@ class qoob {
 	 * @param string $class class name
 	 */
 	function load($class) {
+		//nullbyte poisoning check
+		$class = str_replace(chr(0), '', $class);
 		if(class_exists($class)) {
 			// remove namespace from class name
 			$name = explode('\\', $class);
@@ -309,12 +311,11 @@ class qoob {
 				PATH_SEPARATOR, 
 				array(
 					get_include_path(), 
-					basename(__DIR__).DIRECTORY_SEPARATOR.'utils', 
-					basename(__DIR__).DIRECTORY_SEPARATOR.'core',
 					basename(__DIR__).DIRECTORY_SEPARATOR.'api'
 				)
 			)
 		);
+		spl_autoload_extensions(".php,.inc");
 		spl_autoload_register();
 		$this->load('qoob\utils\benchmark');
 		$this->benchmark->mark('appStart');
