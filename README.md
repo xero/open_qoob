@@ -154,7 +154,7 @@ $qoob->route('GET /info [AJAX]', 'request_types->ajax');
 ```
 
 ##templates
-the qoob uses it's own "mustache style" template engine. this engine is very simple compared to other [http://mustache.github.com/](fully featured mustache implementations).
+the qoob uses it's own "mustache style" template engine. this engine is very simple compared to other [fully featured mustache implementations](http://mustache.github.com/).
 
 ###loading a template
 load the 'stache' template engine. then call the stache->render function.
