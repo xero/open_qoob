@@ -125,21 +125,18 @@ class mysql {
      * the results flag set to false.
      * 
      * @param string $sql
-     * @param array $find
-     * @param array $replace
+     * @param array $args
      * @param boolean $results
      * @return object|boolean
      */
-    public function query($sql, $find, $replace, $results = true) {
-        $clean = array();
-        $formatted = array();
-        foreach ($replace as $key => $value) {
-            $clean[$key] = $this->sanitize($value);
+    public function query($sql, $args, $results = true) {
+        $find = array();
+        $replace = array();
+        foreach ($args as $key => $value) {
+            $find[] = '/'.$key.'/'; 
+            $replace[] = $this->sanitize($value);
         }
-        foreach ($find as $pattern) {
-            $formatted[] = '/'.$pattern.'/';
-        }
-        $this->sql = preg_replace($formatted, $clean, $sql);
+        $this->sql = preg_replace($find, $replace, $sql);
         $query = new mysqlQuery($this->sql, $this->db);
         if($results) {
             return $query->result();

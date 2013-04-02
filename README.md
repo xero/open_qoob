@@ -39,6 +39,7 @@ the qoob is a semi-RESTful php api framework designed to simplify and expedite t
  - [loading classes](#loading-classes)
  - [routing](#routing)
  - [templates](#templates)
+ - [databases](#databases)
 
 ##version
 this is actually version 2.x of the open qoob framework and is a complete rewrite from the ground up. if you're looking for the legacy versions, they are archived here: 
@@ -161,9 +162,9 @@ the qoob uses it's own "mustache style" template engine. this engine is very sim
 load the 'stache' template engine. then call the stache->render function.
 
 the function has two mandatory and one optional arguments:
-- filename [string] : template file name (minus .html extension) 
-- data [array] : name value pairs to replace in the template file
-- return [boolean] : auto echo on false, return string on true (default = false)
+- __filename__ [string] - template file name (minus .html extension) 
+- __data__ [array] - name value pairs to replace in the template file
+- __return__ [boolean] _optional_ - auto echo on false, return string on true (default = false)
 
 here's an example:
 ```php5
@@ -197,9 +198,44 @@ here's an example:
 
 ###mustache types
 there are four types of mustaches that the qoob currently supports:
-- {{var_name}} : regular variable (escaped)
-- {{&unescaped}} : an unescaped variable (may contain html)
-- {{!ignored}} : a variable that will not be rendered
-- {{#required}} : required variables will throw exceptions if not set
+- __{{var_name}}__ - regular variable (escaped)
+- __{{&unescaped}}__ - an unescaped variable (may contain html)
+- __{{!ignored}}__ - a variable that will not be rendered
+- __{{#required}}__ - required variables will throw exceptions if not set
 
 **note:** any non-required variable will be replaced with an empty string if not set by the render function.
+
+##databases
+the qoob currently only supports mysql databases. while it's possible to use the mysql adapter in any class, IMHO using models makes the most sence. to create a model simply create a class that extends the mysql class: `\qoob\core\db\mysql`. add your connection variables in the class constructor then connect. after that all functions of the model will be ready to execute queries. 
+
+###connecting to a db server
+there are two methods necessary to connect to a mysql database, `init` and `connect`.
+
+the `init` method takes four mandatory parameters and an optional one.
+- __db_host__ [string] - the database server host name
+- __db_user__ [string] - the database users
+- __db_pass__ [string] - the password for the database user
+- __db_name__ [string] - the name of the default database to select
+- __asciiOnly__ [boolean] _optional_ - true will allow only ascii characters, false will allow all printable characters (default = true)
+
+once the necessary variables are set with `init` simply call the `connect` function.
+
+###sql queries
+mysql queries are setup very much like qoob routes. variables in your sql statements are prefixed with a `:` (colon) and are written inline. you also pass an array of name value pairs to be sanitized and replaced in your sql statement.
+
+here's an example:
+```php5
+    $result = $this->query(
+      "SELECT * FROM  `code` LIMIT :limit, :offset;",
+      array(
+        ':limit' => 0,
+        ':offset' => 30
+      )
+    );
+    print_r($result);
+```
+
+**note:** there are currently three methods of sanitization applied to each variable. 
+- __stripslashes__ - only called if magic quotes is enabled (legacy compatability)
+- __asciiOnly__ - depending on the value of the `asciiOnly` class variable, all non-printable characters are removed. by default only ascii characters are allowed, if you need to support special/international characters (e.g. ñ, ½, etc) change the value to false.
+- __mysql_real_escape_string__ - uses the db server's internal sql injection protection routines.

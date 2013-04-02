@@ -6,7 +6,7 @@ class codeModel extends \qoob\core\db\mysql {
 
 	function __construct() {
 		$this->qoob = \qoob::open();
-		
+		$this->qoob->benchmark->mark('mysqlConnectStart');
 		$this->init(
 			\library::get('CONFIG.DB.host'), 
 			\library::get('CONFIG.DB.user'), 
@@ -14,19 +14,15 @@ class codeModel extends \qoob\core\db\mysql {
 			\library::get('CONFIG.DB.name')
 		);
 		$this->connect();
-		$this->qoob->benchmark->mark('mysqlConnectEnd');		
+		$this->qoob->benchmark->mark('mysqlConnectEnd');
 	}
 	public function listCode() {
 		$this->qoob->benchmark->mark('mysqlQueryStart');
 		$result = $this->query(
 			"SELECT * FROM  `code` LIMIT :limit, :offset;",
-			$patterns = array(
-				':limit',
-				':offset'
-			),
 			array(
-				0,
-				30
+				':limit' => 0,
+				':offset' => 30
 			)
 		);
 		$this->qoob->benchmark->mark('mysqlQueryEnd');
