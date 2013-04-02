@@ -125,10 +125,10 @@ when this route is requested an instance of the `some_class` will be created and
 $qoob->route('GET /something', 'some_class->some_method');
 ```
 
-route patterns have 2 required parts and one optional one. 
+route patterns have two required parts and one optional one. 
  - __HTTP verb__ - `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, or `CONNECT`
  - __URI pattern__ - e.g. `/home`, `/user/42`, `/blog/page/9`, `/test/:arg`, etc
- - __request type__ - `[SYNC]` or `[AJAX]` *optional*
+ - __request type__ _optional_ - `[SYNC]` or `[AJAX]`
 
 you can create URI argument variables with `:name` syntax. the results of which are passed to your callback function at run time.
 ```php5
@@ -178,7 +178,7 @@ here's an example:
     );    
 ```
 ###creating a template
-creating stache templates are as simple as creating html ones, you simply replace any dynamic value with a mustache variable! but templates are not limited to html. they could be emails, xml, excel, or anything else!
+creating stache templates are simple, you replace any dynamic value with a mustache variable! but templates are not limited to html. they could be emails, xml, excel, or anyt other type of text file.
 
 here's an example:
 ```xml
