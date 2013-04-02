@@ -152,3 +152,35 @@ $qoob->route('GET /info [SYNC]', 'request_types->sync');
 ```php5
 $qoob->route('GET /info [AJAX]', 'request_types->ajax');
 ```
+
+##templates
+the qoob uses it's own "mustache style" template engine. this engine is very simple compared to other [http://mustache.github.com/](fully featured mustache implementations).
+
+###loading a template
+load the 'stache' template engine. then call the stache->render function.
+
+the function has two mandatory and one optional arguments:
+- filename [string] : template file name (minus .html extension) 
+- data [array] : name value pairs to replace in the template file
+- return [boolean] : auto echo on false, return string on true (default = false)
+
+here's an example:
+```php5
+    $this->qoob->load('qoob\core\view\stache');
+    $this->qoob->stache->render(
+      'templateFileName', 
+      array(
+        'name' => 'value',
+        'generator'=> 'open qoob'
+      )
+    );    
+```
+
+###mustache types
+there are four types of mustaches that the qoob currently supports:
+- {{var_name}} : regular variable (escaped)
+- {{&unescaped}} : an unescaped variable (may contain html)
+- {{!ignored}} : a variable that will not be rendered
+- {{#required}} : required variables will throw exceptions if not set
+
+**note:** any non-required variable will be replaced by an empty string if not set by the render function.
