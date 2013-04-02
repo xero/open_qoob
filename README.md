@@ -175,6 +175,24 @@ here's an example:
       )
     );    
 ```
+###creating a template
+creating stache templates are as simple as creating html ones, you simply replace any dynamic value with a mustache variable! but templates are not limited to html. they could be emails, xml, excel, or anything else!
+
+here's an example:
+```xml
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <header><h1>{{title}}</h1></header>
+    <p>{{body}}</p>
+    <footer>&copy; {{year}} {{author}}</footer>
+  </body>
+</html>
+```
 
 ###mustache types
 there are four types of mustaches that the qoob currently supports:
@@ -183,4 +201,4 @@ there are four types of mustaches that the qoob currently supports:
 - {{!ignored}} : a variable that will not be rendered
 - {{#required}} : required variables will throw exceptions if not set
 
-**note:** any non-required variable will be replaced by an empty string if not set by the render function.
+**note:** any non-required variable will be replaced with an empty string if not set by the render function.
