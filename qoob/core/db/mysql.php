@@ -132,10 +132,14 @@ class mysql {
      */
     public function query($sql, $find, $replace, $results = true) {
         $clean = array();
+        $formatted = array();
         foreach ($replace as $key => $value) {
             $clean[$key] = $this->sanitize($value);
         }
-        $this->sql = preg_replace($find, $clean, $sql);
+        foreach ($find as $pattern) {
+            $formatted[] = '/'.$pattern.'/';
+        }
+        $this->sql = preg_replace($formatted, $clean, $sql);
         $query = new mysqlQuery($this->sql, $this->db);
         if($results) {
             return $query->result();
