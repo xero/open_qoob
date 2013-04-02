@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.072
+ * @version 	2.08
  */
 class qoob {
 	/**
@@ -324,8 +324,9 @@ class qoob {
 		$this->load('qoob\utils\benchmark');
 		$this->benchmark->mark('appStart');
 		$this->load('qoob\utils\logz');
-		//die('<h1>path: '.realpath('tmp').'</h1>');
 		$this->logz->setup(realpath('tmp'), 'error.log');
+		library::set('UI.dir', realpath('ui'));
+		library::set('TMP.dir', realpath('tmp'));
 	}
 	/**
 	 * destructor

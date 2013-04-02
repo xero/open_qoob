@@ -21,6 +21,8 @@ $qoob->route('GET /home [sync]', 'request_types->sync');
 $qoob->route('GET /home [ajax]', 'request_types->ajax');
 // database test
 $qoob->route('GET /model', 'app\test->modelTest');
+// view test
+$qoob->route('GET /template', 'app\test->templateTest');
 //______________________________________________________________________________
 //                                                                       execute
 $qoob->run();

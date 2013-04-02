@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>template test | open qoob</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="author" content="{{author}}">
+		<meta name="keywords" content="{{keywords}}">
+		<meta name="description" content="{{description}}">
+		<link href="{{#domain}}ui/css/bootstrap.min.css" rel="stylesheet">
+		<link href="{{#domain}}ui/css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="{{#domain}}ui/css/qoob.css" rel="stylesheet">
+		<script type="text/javascript" src="{{#domain}}ui/js/head.js"></script>
+		<!--[if lt IE 9]>
+			<script src="{{#domain}}ui/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div id="wrap">
+			<div class="container">
+				<br/><br/>
+				<div class="hero-unit">
+					<h1>{{title}}</h1>
+					<p>{{bodyCopy}}</p>
+					<a href="http://github.com/xero/open_qoob" class="btn btn-large btn-primary pull-right">fork me on github!</a>
+				</div>
+			</div>
+			<div id="push"></div>
+		</div>
+		<footer id="footer">
+			<div class="container">
+				<p class="credit">&copy; {{copyright}} . {{year}} . <a href="http://xero.nu/">xero harrison</a> / <a href="http://qoob.nu/">open qoob</a></p>
+			</div>
+		</footer>
+		<script type="text/javascript">
+			head.js("{{#domain}}ui/js/jquery.min.js", "{{#domain}}ui/js/bootstrap.min.js"{{&includes}});
+		</script>
+	</body>
+</html>
