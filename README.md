@@ -38,6 +38,7 @@ the qoob is a semi-RESTful php api framework designed to simplify and expedite t
  - [config](#config)
  - [loading classes](#loading-classes)
  - [routing](#routing)
+ - [templates](#templates)
 
 ##version
 this is actually version 2.x of the open qoob framework and is a complete rewrite from the ground up. if you're looking for the legacy versions, they are archived here: 
