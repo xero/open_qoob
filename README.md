@@ -2,7 +2,8 @@ open qoob framework
 -------------------
 the qoob is a semi-RESTful php api framework designed to simplify and expedite the process of creating dynamic web applications.
 
-### THE QOOB IS CURRENTLY UNDER DEVELOPMENT AND IS SUPER BETA! USE AT YOUR OWN RISK!
+### THE QOOB IS CURRENTLY UNDER ACTIVE DEVELOPMENT AND IS SUPER BETA! 
+### THINGS WILL BE CHANGING SO USE AT YOUR OWN RISK!
 
 ```text
                            MM.                                                   
@@ -168,8 +169,8 @@ the function has two mandatory and one optional arguments:
 
 here's an example:
 ```php5
-    $this->qoob->load('qoob\core\view\stache');
-    $this->qoob->stache->render(
+    $qoob->load('qoob\core\view\stache');
+    $qoob->stache->render(
       'templateFileName', 
       array(
         'name' => 'value',
@@ -225,7 +226,7 @@ mysql queries are setup very much like qoob routes. variables in your sql statem
 
 here's an example:
 ```php5
-    $result = $this->query(
+    $result = $mysql->query(
       "SELECT * FROM  `code` LIMIT :limit, :offset;",
       array(
         ':limit' => 0,
