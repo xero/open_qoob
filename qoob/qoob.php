@@ -30,7 +30,7 @@ class qoob {
 	 * http verbs
 	 */
 	const
-		VERBS='GET|HEAD|POST|PUT|PATCH|DELETE|CONNECT';
+		VERBS='GET|HEAD|POST|PUT|DELETE';
 	/**
 	 * http status codes
 	 * @see http://www.rfc-editor.org/rfc/rfc2616.txt 
@@ -204,6 +204,9 @@ class qoob {
 					for($i=0;$i<count($names[0]);$i++) {
 						$args[str_replace('\:', '', $names[0][$i])] = isset($matches[$i])?$matches[$i]:'';
 					}
+					//get and merge request and uri arguments
+					$requests = $this->parseRequest($verb);
+					$args = array_merge_recursive($requests, $args);
 					break;					
 				}
 			}
@@ -235,6 +238,29 @@ class qoob {
 			call_user_func_array(array(new $parts[1], $parts[3]), array($args));
 		}
 		$this->benchmark->mark('callEnd');
+	}
+	/**
+	 * parse request
+	 * gets request arguments from the correct protocol for the given http verb
+	 *
+	 * @param string $verb the http verb
+	 */
+	function parseRequest($verb) {
+		$args = array();
+		switch ($verb) {
+			case 'GET':
+			case 'HEAD':
+				$args = $_GET;
+			break;
+			case 'POST':
+				$args = $_POST;
+			break;
+			case 'PUT':
+			case 'DELETE':
+				parse_str(file_get_contents('php://input'), $args);
+			break;
+		}
+		return $args;
 	}
 	/**
 	 * run
