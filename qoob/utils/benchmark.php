@@ -6,7 +6,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	1.02
+ * @version 	1.03
  * @package		qoob
  * @subpackage	utils
  */
@@ -36,10 +36,7 @@ class benchmark {
 	 * @return mixed decimal|boolean
 	 */
 	function diff($point1 = "", $point2 = "", $decimals = 4) {
-		if ($point1 == "") {
-			return false;
-		}
-		if (!isset($this->markers[$point1])) {
+		if ($point1 == "" || !isset($this->markers[$point1])) {
 			return false;
 		}
 		if (!isset($this->marker[$point2])) {
