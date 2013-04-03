@@ -24,7 +24,7 @@ class benchmark {
 	 * @return void
 	 */
 	function mark($name) {
-		$this->markers[$name] = microtime();
+		$this->markers[$name] = microtime(true);
 	}	
 	/**
 	 * time difference 
@@ -43,11 +43,9 @@ class benchmark {
 			return false;
 		}
 		if (!isset($this->marker[$point2])) {
-			$this->markers[$point2] = microtime();
+			$this->markers[$point2] = microtime(true);
 		}
-		list($sm, $ss) = explode(" ", $this->markers[$point1]);
-		list($em, $es) = explode(" ", $this->markers[$point2]);
-		return number_format(($em + $es) - ($sm + $ss), $decimals);
+		return number_format($this->markers[$point2]-$this->markers[$point1], $decimals);
 	}
 }
 ?>
