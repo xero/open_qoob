@@ -125,6 +125,10 @@ when this route is requested an instance of the `some_class` will be created and
 ```php5
 $qoob->route('GET /something', 'some_class->some_method');
 ```
+you can also use class namespaces.
+```php5
+$qoob->route('GET /something', 'name\space\some_class->some_method');
+```
 
 route patterns have two required parts and one optional one. 
  - __HTTP verb__ - `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, or `CONNECT`
@@ -191,8 +195,9 @@ here's an example:
   </head>
   <body>
     <header><h1>{{title}}</h1></header>
-    <p>{{body}}</p>
-    <footer>&copy; {{year}} {{author}}</footer>
+    <p>{{&body}}</p>
+    {{!this is a comment}}
+    <footer>&copy; {{#year}} {{#author}}</footer>
   </body>
 </html>
 ```
@@ -226,7 +231,7 @@ mysql queries are setup very much like qoob routes. variables in your sql statem
 
 here's an example:
 ```php5
-    $result = $mysql->query(
+    $result = $qoob->mysql->query(
       "SELECT * FROM  `code` LIMIT :limit, :offset;",
       array(
         ':limit' => 0,
