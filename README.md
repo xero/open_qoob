@@ -159,6 +159,24 @@ $qoob->route('GET /info [SYNC]', 'request_types->sync');
 ```php5
 $qoob->route('GET /info [AJAX]', 'request_types->ajax');
 ```
+RESTful apps respond to request semantically. so depending on the http verb used (e.g. GET, HEAD, POST) variables will be retrieved from a different request method. the qoob handles this internally and gives you access to appropriate ones via an argument variable `$args` passed to the constructor of a callback function.
+```php5
+$qoob->route('POST /testPostVars', function($args){
+  echo "these are from the $_POST superglobal: ".print_r($args, true);
+});
+$qoob->route('GET /testGetVars', function($args){
+  echo "these are from the $_GET superglobal: ".print_r($args, true);
+});
+$qoob->route('DELETE /testDeleteVars', function($args){
+  echo "these are from php://input: ".print_r($args, true);
+});
+```
+if uri arguments are present for a route, the uri arguments will be recursivly merged with the request variables
+```php5
+$qoob->route('POST /testMultiVars/:one/:two/:three', function($args){
+  echo "these are from the uri request and $_POST superglobal: ".print_r($args, true);
+});
+```  
 
 ##templates
 the qoob uses it's own "mustache style" template engine. this engine is very simple compared to other [fully featured mustache implementations](http://mustache.github.com/).
