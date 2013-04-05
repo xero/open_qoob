@@ -6,7 +6,7 @@
  * @author 		xero harrison / http://xero.nu
  * @copyright 	creative commons attribution-shareAlike 3.0 Unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	1.4
+ * @version 	1.42
  * @package		qoob
  * @subpackage	utils 
  */
@@ -63,6 +63,7 @@ class logz {
 	}
 	/**
 	 * write to log
+	 * output in "date (uri) [ip] message" format
 	 *
 	 * @param string $data the content to be written
 	 * @param string $dateFormat php style date format string (default = 'r')
@@ -70,7 +71,7 @@ class logz {
 	function write($data, $dateFormat='r') {
 		file_put_contents(
 			$this->dir.DIRECTORY_SEPARATOR.$this->file, 
-			date($dateFormat).' ['.$this->getIP().'] '.$data.PHP_EOL, 
+			date($dateFormat).' ('.$this->getURI().') ['.$this->getIP().'] '.$data.PHP_EOL, 
 			FILE_APPEND | LOCK_EX
 		);
 	}
@@ -104,6 +105,14 @@ class logz {
 		} else {
 		    return $_SERVER['REMOTE_ADDR'];
 		}
+	}
+	/**
+	 * get uri of current request
+	 *
+	 * @return string uri
+	 */
+	function getURI() {
+		return 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 	}
 	/**
 	 * get the number of lines in a log file

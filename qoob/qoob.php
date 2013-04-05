@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.09
+ * @version 	2.1
  */
 class qoob {
 	/**
@@ -94,7 +94,9 @@ class qoob {
 	 */
 	function status($code) {
 		// account for system thrown exceptions
-		$code = $code>0 ? $code : 500;
+		if(!defined('self::HTTP_'.$code)) {
+			$code = 500;
+		}
 		// no commandline headers
 		if (PHP_SAPI!='cli') {
 			header('HTTP/1.1 '.$code);
@@ -280,21 +282,36 @@ class qoob {
 			preg_split('/[,;|]/',$str,0,PREG_SPLIT_NO_EMPTY));
 	}
 	/**
+	 * fatal error handler
+	 * gracefully respond to fatal errors.
+	 */
+	function fatal_handler() {
+		if(@is_array($err = @error_get_last())) {
+			$code = isset($err['type']) ? $err['type'] : 0;
+			if($code>0) {
+				$this->error_handler(
+					$code,
+					isset($err['message']) ? $err['message'] : '',
+					isset($err['file']) ? $err['file'] : '',
+					isset($err['line']) ? $err['line'] : ''
+				);
+			}
+		}
+	}
+	/**
 	 * exception handler
 	 * gracefully respond to exceptions.
 	 *
 	 * @param object $exc the php exception object
 	 */
 	function exception_handler($exc) {
-		$code = $exc->getCode();
-		$msg = $exc->getMessage();
-		$this->status($code);
-		/**
-		  * @todo respond in the correct context
-		  */
-		$this->logz->changeFile('error.log');
-		$this->logz->write('exception: '.$code.' - '.$msg);
-		die("<h1>open qoob</h1><h3>exception: ".$code."!</h3><p>".$msg."</p>");
+		$this->error_handler(
+			$exc->getCode(),
+			$exc->getMessage(),
+			$exc->getFile(),
+			$exc->getLine(),
+			$exc->getTrace()
+		);		
 	}
 	/**
 	 * error handler
@@ -306,11 +323,17 @@ class qoob {
 	 * @param int $line line number in the file throwing the error
 	 * @param array $ctx error context
 	 */	
-	function error_handler($num, $str, $file, $line, $ctx) {
-		$this->status($num);
+	function error_handler($num, $str, $file, $line, $ctx=array()) {
+		//remove php error output
+		@ob_end_clean();
+		$code = $this->status($num);
 		$this->logz->changeFile('error.log');
-		$this->logz->write('error: '.$num.' '.$str.' '.$file.' '.$line.' '.print_r($ctx, true));
-		die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>num: '.$num.'<br/>str: '.$str.'<br/>file: '.$file.'<br/>line: '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
+		$this->logz->write('error: '.$num.' - '.$str.' [file] '.$file.' [line] '.$line.' [context] '.trim(preg_replace('/\s+/', ' ', print_r($ctx, true))));
+		if(library::get('CONFIG.debug')==true) {
+			die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>'.$str.'<br/><strong>file:</strong> '.$file.'<br/><strong>line:</strong> '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
+		} else {
+			die('<h1>open qoob</h1><h3>error: '.$code.'</h3>');
+		}
 	}
 	/**
 	 * open qoob
@@ -331,11 +354,12 @@ class qoob {
 	private function __clone() {}
 	/**
 	 * constructor
-	 * bootstraps the framework. initializes autoloading classes.
+	 * bootstraps the framework. setup error handling. initializes autoloading classes.
 	 */
 	private function __construct() {
 		set_error_handler(array(&$this, 'error_handler'));
 		set_exception_handler(array(&$this, 'exception_handler'));
+		register_shutdown_function(array(&$this, 'fatal_handler'));
 		set_include_path(
 			implode(
 				PATH_SEPARATOR, 
@@ -347,27 +371,30 @@ class qoob {
 		);
 		spl_autoload_extensions(".php,.inc");
 		spl_autoload_register();
+		library::set('UI.dir', realpath('ui'));
+		library::set('TMP.dir', realpath('tmp'));
+		library::set('CONFIG.debug', false);
 		$this->load('qoob\utils\benchmark');
 		$this->benchmark->mark('appStart');
 		$this->load('qoob\utils\logz');
 		$this->logz->setup(realpath('tmp'), 'error.log');
-		library::set('UI.dir', realpath('ui'));
-		library::set('TMP.dir', realpath('tmp'));
 	}
 	/**
 	 * destructor
-	 * displays the benchmarks
+	 * calculate the benchmarks
 	 */
 	public function __destruct() {
-		foreach ($this->benchmark->markers as $key => $value) {
-			if(strpos($key, 'Start')>0) {
-				$mark = substr($key, 0, strpos($key, 'Start'));
-				$markers[$mark] = ($x=$this->benchmark->diff($mark.'Start', $mark.'End'))==false?('did not run'):($x.' seconds');
+		if(library::get('CONFIG.debug')==true) {
+			foreach ($this->benchmark->markers as $key => $value) {
+				if(strpos($key, 'Start')>0) {
+					$mark = substr($key, 0, strpos($key, 'Start'));
+					$markers[$mark] = ($x=$this->benchmark->diff($mark.'Start', $mark.'End'))==false?('did not run'):($x.' seconds');
+				}
 			}
+			echo str_replace('Array', 'benchmarks', '<pre style="border:1px solid #333;background:#ccc;padding:20px">'.print_r($markers, true).'</pre>');
+			$this->logz->changeFile('benchmark.log');
+			$this->logz->write(json_encode($markers));
 		}
-		echo str_replace('Array', 'benchmarks', '<pre style="border:1px solid #333;background:#ccc;padding:20px">'.print_r($markers, true).'</pre>');
-		$this->logz->changeFile('benchmark.log');
-		$this->logz->write(json_encode($markers));
 	}
 }
 //_________________________________________________________________________
