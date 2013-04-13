@@ -196,7 +196,7 @@ here's an example:
       'templateFileName', 
       array(
         'title' => 'open qoob',
-        'body'=> 'open qoob',
+        'body'=> '<p>hello world!</p>',
         'year' => date('Y'),
         'author' => 'xero harrison'
       )
@@ -215,7 +215,7 @@ here's an example:
   </head>
   <body>
     <header><h1>{{&title}}</h1></header>
-    <p>{{@body}}</p>
+    {{@body}}
     {{!this is a comment}}
     <p>{{optional}}</p>
     <footer>&copy; {{#year}} {{#author}}</footer>
