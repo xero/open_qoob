@@ -36,10 +36,10 @@ class test {
 			'templateTest', 
 			array(
 				'author' => \library::get('CONFIG.GENERAL.author'),
-				'@copyright' => \library::get('CONFIG.GENERAL.copyrightHTML'),
+				'copyright' => \library::get('CONFIG.GENERAL.copyrightHTML'),
 				'keywords' => \library::get('CONFIG.GENERAL.keywords'),
 				'description' => \library::get('CONFIG.GENERAL.description'),
-				'#domain' => $url,
+				'domain' => $url,
 				'year'=> $s, 
 				'title'=> 'open qoob', 
 				'bodyCopy'=>'a semi-RESTful php api framework designed to simplify and expedite the process of creating dynamic web applications.'

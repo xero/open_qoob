@@ -13,7 +13,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.3
+ * @version 	2.32
  */
 namespace qoob\core\view;
 class stache {
@@ -65,11 +65,14 @@ class stache {
 			$replace = array();
 			foreach ($staches as $key => $value) {
 				$patterns[] = '/{{'.$value.'}}/';
-				if(isset($data[$value])) {
-					switch(substr($value, 0, 1)) {
+				$prefix = substr($value, 0, 1);
+				$value_name = preg_replace('/[\&\!\#\@]/', '', $value);
+				//assigned variable
+				if(isset($data[$value_name])) {
+					switch($prefix) {
 						//unescaped
 						case '&':
-							$replace[] = $data[$value];
+							$replace[] = $data[$value_name];
 						break;
 						//ignored
 						case '!':
@@ -80,25 +83,34 @@ class stache {
 							if(trim($value) === '') {
 								throw new \Exception(sprintf(self::E_Require, ltrim($data[$value],'#')), 500);
 							}
-							$replace[] = htmlentities($data[$value]);
+							$replace[] = htmlentities($data[$value_name]);
 						break;
 						//required unescaped
 						case '@':
 							if(trim($value) === '') {
-								throw new \Exception(sprintf(self::E_Require, ltrim($data[$value],'#')), 500);
+								throw new \Exception(sprintf(self::E_Require, ltrim($data[$value_name],'@')), 500);
 							}
-							$replace[] = $data[$value];
+							$replace[] = $data[$value_name];
 						break;
 						//escaped
 						default:
-							$replace[] = htmlentities($data[$value]);
+							$replace[] = htmlentities($data[$value_name]);
 						break;
-					} 					
+					}
+				//unassigned variable
 				} else {
-					if(substr($value, 0, 1) == '#') {
-						throw new \Exception(sprintf(self::E_Require, ltrim($value,'#')), 500);
-					} else {
-						$replace[] = '';
+					switch ($prefix) {
+						//required
+						case '#':
+							throw new \Exception(sprintf(self::E_Require, ltrim($value,'#')), 500);
+						break;
+						case '@':
+							throw new \Exception(sprintf(self::E_Require, ltrim($value,'@')), 500);
+						break;
+						//empty
+						default:
+							$replace[] = '';
+						break;
 					}
 				}
 			}
