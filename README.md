@@ -195,8 +195,10 @@ here's an example:
     $qoob->stache->render(
       'templateFileName', 
       array(
-        'name' => 'value',
-        'generator'=> 'open qoob'
+        'title' => 'open qoob',
+        'body'=> 'open qoob',
+        'year' => date('Y'),
+        'author' => 'xero harrison'
       )
     );    
 ```
@@ -209,12 +211,13 @@ here's an example:
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>{{title}}</title>
+    <title>{{&title}}</title>
   </head>
   <body>
-    <header><h1>{{title}}</h1></header>
-    <p>{{&body}}</p>
+    <header><h1>{{&title}}</h1></header>
+    <p>{{@body}}</p>
     {{!this is a comment}}
+    <p>{{optional}}</p>
     <footer>&copy; {{#year}} {{#author}}</footer>
   </body>
 </html>
@@ -226,6 +229,7 @@ there are four types of mustaches that the qoob currently supports:
 - __{{&unescaped}}__ - an unescaped variable (may contain html)
 - __{{!ignored}}__ - a variable that will not be rendered
 - __{{#required}}__ - required variables will throw exceptions if not set
+- __{{@unescaped_required}}__ - unescaped required variable
 
 **note:** any non-required variable will be replaced with an empty string if not set by the render function.
 
