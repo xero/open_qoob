@@ -8,11 +8,12 @@
  * {{&unescaped}} = an unescaped variable (may contain html)
  * {{!ignored}} = a variable that will not be rendered
  * {{#required}} = required variables will throw exceptions if not set
+ * {{@unescaped_required}} = required unescaped variable
  *
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.22
+ * @version 	2.3
  */
 namespace qoob\core\view;
 class stache {
@@ -80,6 +81,13 @@ class stache {
 								throw new \Exception(sprintf(self::E_Require, ltrim($data[$value],'#')), 500);
 							}
 							$replace[] = htmlentities($data[$value]);
+						break;
+						//required unescaped
+						case '@':
+							if(trim($value) === '') {
+								throw new \Exception(sprintf(self::E_Require, ltrim($data[$value],'#')), 500);
+							}
+							$replace[] = $data[$value];
 						break;
 						//escaped
 						default:

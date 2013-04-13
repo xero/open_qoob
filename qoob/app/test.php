@@ -36,7 +36,7 @@ class test {
 			'templateTest', 
 			array(
 				'author' => \library::get('CONFIG.GENERAL.author'),
-				'copyright' => \library::get('CONFIG.GENERAL.copyright'),
+				'@copyright' => \library::get('CONFIG.GENERAL.copyrightHTML'),
 				'keywords' => \library::get('CONFIG.GENERAL.keywords'),
 				'description' => \library::get('CONFIG.GENERAL.description'),
 				'#domain' => $url,
