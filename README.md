@@ -224,7 +224,7 @@ here's an example:
 ```
 
 ###mustache types
-there are four types of mustaches that the qoob currently supports:
+there are five types of mustaches that the qoob currently supports:
 - __{{var_name}}__ - regular variable (escaped)
 - __{{&unescaped}}__ - an unescaped variable (may contain html)
 - __{{!ignored}}__ - a variable that will not be rendered

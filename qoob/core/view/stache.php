@@ -1,7 +1,7 @@
 <?php
 /**
  * stache
- * a simple mustache style template system. this is not a full mustache implementation (yet!)
+ * a simple mustache inspired template system
  *
  * @example
  * {{var_name}} = regular variable (escaped)
@@ -13,7 +13,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.32
+ * @version 	2.33
  */
 namespace qoob\core\view;
 class stache {
