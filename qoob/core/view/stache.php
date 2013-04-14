@@ -81,14 +81,14 @@ class stache {
 						//required
 						case '#':
 							if(trim($value) === '') {
-								throw new \Exception(sprintf(self::E_Require, ltrim($data[$value],'#')), 500);
+								throw new \Exception(sprintf(self::E_Require, $value_name), 500);
 							}
 							$replace[] = htmlentities($data[$value_name]);
 						break;
 						//required unescaped
 						case '@':
 							if(trim($value) === '') {
-								throw new \Exception(sprintf(self::E_Require, ltrim($data[$value_name],'@')), 500);
+								throw new \Exception(sprintf(self::E_Require, $value_name), 500);
 							}
 							$replace[] = $data[$value_name];
 						break;
@@ -102,10 +102,10 @@ class stache {
 					switch ($prefix) {
 						//required
 						case '#':
-							throw new \Exception(sprintf(self::E_Require, ltrim($value,'#')), 500);
+							throw new \Exception(sprintf(self::E_Require, $value_name), 500);
 						break;
 						case '@':
-							throw new \Exception(sprintf(self::E_Require, ltrim($value,'@')), 500);
+							throw new \Exception(sprintf(self::E_Require, $value_name), 500);
 						break;
 						//empty
 						default:
