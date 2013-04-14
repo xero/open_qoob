@@ -14,6 +14,9 @@ class test {
 	function dating($args) {
 		echo '<h1>open qoob</h1><p>date test method.<pre>'.print_r($args, true)."</pre></p>";
 	}
+	static function staticMethod($args) {
+		echo '<h1>open qoob</h1><p>static method test.</p>';
+	}
 	function modelTest(){
 		$this->qoob->benchmark->mark('modelLoadStart');
 		$this->qoob->load('model\codeModel');

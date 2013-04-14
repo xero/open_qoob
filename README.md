@@ -64,7 +64,7 @@ $qoob = qoob::open();
 ##config
 INI files can be used to load configuration variables into the library. pass the location of the file to the `config` method to load it.
 ```php
-$qoob->config('qoob/api/config.ini.php');
+$qoob->config('qoob/app/config.ini.php');
 ```
 variables in the file will be added to the library with the CONFIG pseudo namespace.
 ```
@@ -124,6 +124,10 @@ $qoob->route('GET /home', function() {
 when this route is requested an instance of the `some_class` will be created and its `some_method` will be called.
 ```php5
 $qoob->route('GET /something', 'some_class->some_method');
+```
+you can also use static methods
+```php5
+$qoob->route('GET /static', 'some_class::static_method');
 ```
 you can also use class namespaces.
 ```php5
@@ -203,7 +207,7 @@ here's an example:
     );    
 ```
 ###creating a template
-creating stache templates are simple, you replace any dynamic value with a mustache variable! but templates are not limited to html. they could be emails, xml, excel, or anyt other type of text file.
+creating stache templates are simple, you replace any dynamic value with a mustache variable! but templates are not limited to html. they could be emails, xml, excel, or any other type of text file.
 
 here's an example:
 ```xml

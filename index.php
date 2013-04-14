@@ -16,6 +16,7 @@ $qoob->route('GET /home/:sometime', function($args) {
 // class->method style callbacks (using namespaces)
 $qoob->route('GET /things/going', 'app\test->blah');
 $qoob->route('GET /date/:month/:day/:year', 'app\test->dating');
+$qoob->route('GET /static', 'app\test::staticMethod');
 // callbacks with different request methods (without namespaces)
 $qoob->route('GET /home [sync]', 'request_types->sync');
 $qoob->route('GET /home [ajax]', 'request_types->ajax');
