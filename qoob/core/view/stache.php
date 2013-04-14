@@ -99,18 +99,10 @@ class stache {
 					}
 				//unassigned variable
 				} else {
-					switch ($prefix) {
-						//required
-						case '#':
-							throw new \Exception(sprintf(self::E_Require, $value_name), 500);
-						break;
-						case '@':
-							throw new \Exception(sprintf(self::E_Require, $value_name), 500);
-						break;
-						//empty
-						default:
-							$replace[] = '';
-						break;
+					if($prefix == '#' || $prefix == '@') {
+						throw new \Exception(sprintf(self::E_Require, $value_name), 500);
+					} else {
+						$replace[] = '';
 					}
 				}
 			}
