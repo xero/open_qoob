@@ -133,7 +133,7 @@ class mysql {
         $find = array();
         $replace = array();
         foreach ($args as $key => $value) {
-            $find[] = '/'.$key.'/'; 
+            $find[] = '/:'.$key.'/'; 
             $replace[] = $this->sanitize($value);
         }
         $this->sql = preg_replace($find, $replace, $sql);

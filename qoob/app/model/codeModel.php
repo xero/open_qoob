@@ -21,8 +21,8 @@ class codeModel extends \qoob\core\db\mysql {
 		$result = $this->query(
 			"SELECT * FROM  `code` LIMIT :limit, :offset;",
 			array(
-				':limit' => 0,
-				':offset' => 30
+				'limit' => 0,
+				'offset' => 30
 			)
 		);
 		$this->qoob->benchmark->mark('mysqlQueryEnd');
