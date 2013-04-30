@@ -54,7 +54,7 @@ this is actually version 2.x of the open qoob framework and is a complete rewrit
 
 ##getting started
 ###database installation
-install the `db.sql` file on your mysql server. add the connection information to the `qoob\app\config`
+install the `db.sql` file on your mysql server. add the connection information to the `qoob\app\config` file.
 
 ###framework init
 to load the open qoob into memory in your index.php call:
@@ -266,14 +266,30 @@ here's an example:
     $result = $qoob->mysql->query(
       "SELECT * FROM  `code` LIMIT :limit, :offset;",
       array(
-        ':limit' => 0,
-        ':offset' => 30
+        'limit' => 0,
+        'offset' => 30
       )
     );
     print_r($result);
 ```
+if you want to insert data, set the 3rd parameter of the query function (results) to false. 
+```php5
+    $qoob->mysql->query(
+      "INSERT INTO `code` (`code_id`, `key`, `val`) VALUES (NULL, ':key', ':val');",
+      array(
+        'key' => 'hello',
+        'val' => 'world'
+      ),
+      false
+    );
+```
+if you want the newly created ID from an insert statment, call the `insertID` function.
+```php5
+    $newID = $qoob->mysql->insertID();
+```
 
-**note:** there are currently three methods of sanitization applied to each variable. 
+###auto-sanitization
+there are currently three methods of sanitization applied to each variable. 
 - __stripslashes__ - only called if magic quotes is enabled (legacy compatability)
 - __asciiOnly__ - depending on the value of the `asciiOnly` class variable, all non-printable characters are removed. by default only ascii characters are allowed, if you need to support special/international characters (e.g. ñ, ½, etc) change the value to false.
 - __mysql_real_escape_string__ - uses the db server's internal sql injection protection routines.
