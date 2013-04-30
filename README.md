@@ -49,9 +49,14 @@ this is actually version 2.x of the open qoob framework and is a complete rewrit
 
 ##requirements
  - PHP 5.1.2
- - apache mod_rewrite
+ - mySQL 5.0+
+ - Apache mod_rewrite
 
 ##getting started
+###database installation
+install the `db.sql` file on your mysql server. add the connection information to the `qoob\app\config`
+
+###framework init
 to load the open qoob into memory in your index.php call:
 ```php5
 $qoob = require('qoob/open_qoob.php');
@@ -243,12 +248,13 @@ the qoob currently only supports mysql databases. while it's possible to use the
 ###connecting to a db server
 there are two methods necessary to connect to a mysql database, `init` and `connect`.
 
-the `init` method takes four mandatory parameters and an optional one.
+the `init` method takes four mandatory parameters and two optional ones.
 - __db_host__ [string] - the database server host name
 - __db_user__ [string] - the database users
 - __db_pass__ [string] - the password for the database user
 - __db_name__ [string] - the name of the default database to select
 - __asciiOnly__ [boolean] _optional_ - true will allow only ascii characters, false will allow all printable characters (default = true)
+- __keepAlive__ [boolean] _optional_ - true will not close the database on class destruction (default = false)
 
 once the necessary variables are set with `init` simply call the `connect` function.
 
