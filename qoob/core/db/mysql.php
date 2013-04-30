@@ -6,7 +6,7 @@
  * @author      xero harrison <x@xero.nu>
  * @copyright   creative commons attribution-shareAlike 3.0 unported
  * @license     http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version     2.41
+ * @version     2.42
  */
 namespace qoob\core\db;
 class mysql {
@@ -16,34 +16,40 @@ class mysql {
     const
         E_Server = 'Failed to connect: %s',
         E_Database = 'Failed to select database: %s';
-    /**
-     * @var string $dbhost the database hostname
-     */
-    private $dbhost;
-    /**
-     * @var string $dbuser the database username
-     */
-    private $dbuser;
-    /**
-     * @var string $dbpass the database password
-     */
-    private $dbpass;
-    /**
-     * @var string $dbname the database name
-     */
-    private $dbname;    
-    /**
-     * @var object $db the database reference
-     */
-    protected $db = null;
-    /**
-     * @var string $sql the sql query
-     */    
-    protected $sql = null;
-    /**
-     * @var bool $asciiOnly true will allow only ascii characters, false will allow all printable characters
-     */
-    private $asciiOnly = true;
+    protected 
+        /**
+         * @var object $db the database reference
+         */
+        $db = null,
+        /**
+         * @var string $sql the sql query
+         */    
+        $sql = null;
+    private
+        /**
+         * @var string $dbhost the database hostname
+         */
+        $dbhost,
+        /**
+         * @var string $dbuser the database username
+         */
+        $dbuser,
+        /**
+         * @var string $dbpass the database password
+         */
+        $dbpass,
+        /**
+         * @var string $dbname the database name
+         */
+        $dbname,
+        /**
+         * @var bool $asciiOnly true will allow only ascii characters, false will allow all printable characters
+         */
+        $asciiOnly = true,
+        /**
+         * @var bool $keepAlive true will not close the mySQL connection on class destruction
+         */
+        $keepAlive = false;
 
     /**
      * initializer
@@ -55,12 +61,13 @@ class mysql {
      * @param string $db_name  
      * @param boolean $asciiOnly default = true
      */
-    public function init($db_host, $db_user, $db_pass, $db_name, $asciiOnly=true) {
+    public function init($db_host, $db_user, $db_pass, $db_name, $asciiOnly=true, $keepAlive=false) {
         $this->dbhost = $db_host;
         $this->dbuser = $db_user;
         $this->dbpass = $db_pass;
         $this->dbname = $db_name;
         $this->asciiOnly = $asciiOnly;
+        $this->keepAlive = $keepAlive;
     }
     /**
      * is ascii
@@ -102,7 +109,6 @@ class mysql {
         $this->init($db_host, $db_user, $db_pass, $db_name);
         $this->connect();
     }
-
     /**
      * sanitize
      * mitigate attack vectors by removing offending slashes, removing non printable characters, and filtering it against the mysql server's own escape function.
@@ -117,7 +123,6 @@ class mysql {
         $filtered = $this->asciiOnly ? trim(preg_replace('/[^\x0A\x0D\x20-\x7E]/', '', $string)) : trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $string));
         return mysql_real_escape_string($filtered);
     }
-    
     /**
      * SQL query function
      * executes a mysql query.
@@ -144,7 +149,6 @@ class mysql {
             return true;
         }
     }
-    
     /**
      * get insertID
      * get the last inserted record's id
@@ -154,13 +158,14 @@ class mysql {
     public function insertID() {
         return mysql_insert_id($this->db);
     }
-    
     /**
      * destructor
-     * close the connection when finished
+     * if keepAlive is false close the connection when finished
      */
     public function __destruct() {
-        @mysql_close($this->db);
+        if(!$this->keepAlive) {
+            @mysql_close($this->db);
+        }
     }
 }
 /**
@@ -170,7 +175,7 @@ class mysql {
  */
 class mysqlQuery {
     protected $result;
-    private $link = null;
+    protected $link = null;
     
     /**
      * constructor
@@ -185,7 +190,6 @@ class mysqlQuery {
             throw new dbException($query, 500);
         }
     }
-    
     /**
      * get result
      * returns the results of the mysql query
@@ -199,7 +203,6 @@ class mysqlQuery {
         }
         return $result;
     }
-
     /**
      * number of rows
      * returns the number of rows in a given result
@@ -209,7 +212,6 @@ class mysqlQuery {
     public function num_rows() {
         return @mysql_num_rows($this->link);
     }
-
     /**
      * destructor
      * call's free result only if one has been created
