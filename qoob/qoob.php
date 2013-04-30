@@ -325,9 +325,9 @@ class qoob {
 		//remove php error output
 		@ob_end_clean();
 		$code = $this->status($num);
-		$this->stats->mine();
 		$this->logz->changeFile('error.log');
 		$this->logz->write('error: '.$num.' - '.$str.' [file] '.$file.' [line] '.$line.' [context] '.trim(preg_replace('/\s+/', ' ', print_r($ctx, true))));
+		$this->stats->mine();
 		if(library::get('CONFIG.debug')==true) {
 			die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>'.$str.'<br/><strong>file:</strong> '.$file.'<br/><strong>line:</strong> '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
 		} else {

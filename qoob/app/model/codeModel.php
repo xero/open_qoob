@@ -1,6 +1,6 @@
 <?php
 
-namespace model;
+namespace app\model;
 class codeModel extends \qoob\core\db\mysql {
 	protected $qoob;
 
@@ -11,22 +11,43 @@ class codeModel extends \qoob\core\db\mysql {
 			\library::get('CONFIG.DB.host'), 
 			\library::get('CONFIG.DB.user'), 
 			\library::get('CONFIG.DB.pass'), 
-			\library::get('CONFIG.DB.name')
+			\library::get('CONFIG.DB.name'),
+			true,
+			true
 		);
 		$this->connect();
 		$this->qoob->benchmark->mark('mysqlConnectEnd');
 	}
-	public function listCode() {
-		$this->qoob->benchmark->mark('mysqlQueryStart');
-		$result = $this->query(
-			"SELECT * FROM  `code` LIMIT :limit, :offset;",
+	public function listCode($limit, $offset) {
+		return $this->query(
+			"SELECT * FROM  `code` LIMIT :offset, :limit;",
 			array(
-				'limit' => 0,
-				'offset' => 30
+				'limit' => $limit,
+				'offset' => $offset
 			)
 		);
-		$this->qoob->benchmark->mark('mysqlQueryEnd');
-		return $result;		
+	}
+	public function listAll() {
+		$this->query(
+			"SELECT * FROM  `code`;",
+			array(),
+			false, //dont return results
+			true   //count rows
+		);
+		return $this->num_rows();
+	}
+	public function addCode($key, $val) {
+		$this->query(
+			"INSERT INTO `qoob`.`code` (`code_id`, `key`, `val`) VALUES (NULL, ':key', ':val');",
+			array(
+				'key' => $key,
+				'val' => $val
+			),
+			false
+		);
+	}
+	public function getID() {
+		return $this->insertID();
 	}
 }
 

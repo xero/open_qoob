@@ -49,7 +49,11 @@ class mysql {
         /**
          * @var bool $keepAlive true will not close the mySQL connection on class destruction
          */
-        $keepAlive = false;
+        $keepAlive = false,
+        /**
+         * @var int $count mysql_num_rows result
+         */
+        $count = 0;
 
     /**
      * initializer
@@ -125,16 +129,15 @@ class mysql {
     }
     /**
      * SQL query function
-     * executes a mysql query.
-     * make sure all insert, and update statements have
-     * the results flag set to false.
+     * executes a mysql query. make sure all insert, and update statements have the results flag set to false.
      * 
      * @param string $sql
      * @param array $args
      * @param boolean $results
+     * @param boolean $count
      * @return object|boolean
      */
-    public function query($sql, $args, $results = true) {
+    public function query($sql, $args, $results = true, $count = false) {
         $find = array();
         $replace = array();
         foreach ($args as $key => $value) {
@@ -143,6 +146,7 @@ class mysql {
         }
         $this->sql = preg_replace($find, $replace, $sql);
         $query = new mysqlQuery($this->sql, $this->db);
+        $this->count = $count ? $query->num_rows() : 0;
         if($results) {
             return $query->result();
         } else {
@@ -159,6 +163,15 @@ class mysql {
         return mysql_insert_id($this->db);
     }
     /**
+     * get num_rows
+     * returns the numbers of rows from a query
+     * 
+     * @return int|string
+     */
+    public function num_rows() {
+        return $this->count;
+    }
+    /**
      * destructor
      * if keepAlive is false close the connection when finished
      */
@@ -170,13 +183,10 @@ class mysql {
 }
 /**
  * mysql query
- * 
- *
+ * class for executing queries and handling mysql results.
  */
 class mysqlQuery {
-    protected $result;
-    protected $link = null;
-    
+    protected $result;    
     /**
      * constructor
      * gets the results of the mysql query or throws a dbException error
@@ -185,7 +195,6 @@ class mysqlQuery {
      * @param object $link mysql_connection
      */
     public function __construct($query, $link) {
-        $this->link = $link;
         if(($this->result = @mysql_query($query, $link)) === false) {
             throw new dbException($query, 500);
         }
@@ -210,9 +219,8 @@ class mysqlQuery {
      * @return int
      */
     public function num_rows() {
-        return @mysql_num_rows($this->link);
-    }
-    /**
+        return @mysql_num_rows($this->result);
+    }    /**
      * destructor
      * call's free result only if one has been created
      */
