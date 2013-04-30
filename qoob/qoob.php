@@ -81,11 +81,7 @@ class qoob {
 		HTTP_503='Service Unavailable',
 		HTTP_504='Gateway Timeout',
 		HTTP_505='HTTP Version Not Supported';
-	/**
-	 * internal variables
-	 */
-	private 
-		$debug;
+
 	/**
 	 * status
 	 * echo http header and return status message
@@ -101,6 +97,7 @@ class qoob {
 		if (PHP_SAPI!='cli') {
 			header('HTTP/1.1 '.$code);
 		}
+		library::set('STATUS.code', $code);
 		return @constant('self::HTTP_'.$code);
 	}
 	/**
@@ -185,9 +182,9 @@ class qoob {
 	 */
 	function parseRoutes() {
 		$this->benchmark->mark('parseStart');
-    	$verb = $_SERVER['REQUEST_METHOD'];
     	library::set('QOOB.url', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
     	library::set('QOOB.domain', 'http://'.dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"]));
+    	library::set('REQUEST.verb', $_SERVER['REQUEST_METHOD']);
     	library::set('REQUEST.uri', rtrim(str_replace(library::get('QOOB.domain'), '', library::get('QOOB.url')), '/'));
     	library::set('REQUEST.ajax', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
     	$found = false;
@@ -196,7 +193,7 @@ class qoob {
 			$pattern = "@^".preg_replace('/\\\:[a-zA-Z0-9\_\-]+/', '([a-zA-Z0-9\-\_]+)', preg_quote($route['pattern']))."$@D";
 			$args = array();
 			// check if the current request matches the expression
-			if($verb == $route['verb'] && preg_match($pattern, library::get('REQUEST.uri'), $matches)) {
+			if(library::get('REQUEST.verb') == $route['verb'] && preg_match($pattern, library::get('REQUEST.uri'), $matches)) {
 				if($route['type'] == library::get('REQUEST.ajax')) {
 					// remove the first match
 					array_shift($matches);
@@ -207,7 +204,7 @@ class qoob {
 						$args[str_replace('\:', '', $names[0][$i])] = isset($matches[$i])?$matches[$i]:'';
 					}
 					//get and merge request and uri arguments
-					$requests = $this->parseRequest($verb);
+					$requests = $this->parseRequest(library::get('REQUEST.verb'));
 					$args = array_merge_recursive($requests, $args);
 					break;					
 				}
@@ -266,10 +263,11 @@ class qoob {
 	}
 	/**
 	 * run
-	 * begin framework execution
+	 * framework execution
 	 */
 	function run() {
 		$this->parseRoutes();
+		$this->stats->mine();
 	}
 	/**
 	 * split
@@ -327,6 +325,7 @@ class qoob {
 		//remove php error output
 		@ob_end_clean();
 		$code = $this->status($num);
+		$this->stats->mine();
 		$this->logz->changeFile('error.log');
 		$this->logz->write('error: '.$num.' - '.$str.' [file] '.$file.' [line] '.$line.' [context] '.trim(preg_replace('/\s+/', ' ', print_r($ctx, true))));
 		if(library::get('CONFIG.debug')==true) {
@@ -354,7 +353,7 @@ class qoob {
 	private function __clone() {}
 	/**
 	 * constructor
-	 * bootstraps the framework. setup error handling. initializes autoloading classes.
+	 * bootstraps the framework/core utils. setup error handling. initializes autoloading classes. set default variables.
 	 */
 	private function __construct() {
 		set_error_handler(array(&$this, 'error_handler'));
@@ -371,6 +370,7 @@ class qoob {
 		);
 		spl_autoload_extensions(".php,.inc");
 		spl_autoload_register();
+		library::set('STATUS.code', 200);
 		library::set('UI.dir', realpath('ui'));
 		library::set('TMP.dir', realpath('tmp'));
 		library::set('CONFIG.debug', false);
@@ -378,6 +378,7 @@ class qoob {
 		$this->benchmark->mark('appStart');
 		$this->load('qoob\utils\logz');
 		$this->logz->setup(realpath('tmp'), 'error.log');
+		$this->load('qoob\utils\stats');
 	}
 	/**
 	 * destructor
