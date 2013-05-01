@@ -287,6 +287,16 @@ if you want the newly created ID from an insert statment, call the `insertID` fu
 ```php5
     $newID = $qoob->mysql->insertID();
 ```
+if you want just a count of rows effected by your query set the 4th parameter to true. then call the `num_rows` function.
+```php5
+    $qoob->mysql->query(
+      "SELECT * FROM  `code`;",
+      array(),
+      false, //dont return results
+      true   //count rows
+    );
+    return $qoob->mysql->num_rows();
+```
 
 ###auto-sanitization
 there are currently three methods of sanitization applied to each variable. 

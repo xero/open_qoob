@@ -137,7 +137,7 @@ class mysql {
      * @param boolean $count
      * @return object|boolean
      */
-    public function query($sql, $args, $results = true, $count = false) {
+    public function query($sql, $args = array(), $results = true, $count = false) {
         $find = array();
         $replace = array();
         foreach ($args as $key => $value) {

@@ -19,10 +19,26 @@ class test {
 	}
 	function modelTest(){
 		$this->qoob->benchmark->mark('modelLoadStart');
-		$this->qoob->load('model\codeModel');
+		$this->qoob->load('app\model\codeModel');
 		$this->qoob->benchmark->mark('modelLoadEnd');
 
-		$result = $this->qoob->codeModel->listCode();
+		$this->qoob->benchmark->mark('modelAddStart');
+		$this->qoob->codeModel->addCode('hello', 'world');
+		$this->qoob->benchmark->mark('modelAddEnd');
+
+		$this->qoob->benchmark->mark('modelIdStart');
+		$id = $this->qoob->codeModel->getID();		
+		$this->qoob->benchmark->mark('modelIdend');
+		echo 'added new id: '.$id.'<br/>';
+
+		$this->qoob->benchmark->mark('modelCountStart');
+		$count = $this->qoob->codeModel->listAll();
+		$this->qoob->benchmark->mark('modelCountEnd');
+		echo $count.' total rows in the table<br/>';
+
+		$this->qoob->benchmark->mark('modelListStart');
+		$result = $this->qoob->codeModel->listCode($count, 0);
+		$this->qoob->benchmark->mark('modelListEnd');
 		echo "<pre>".print_r($result, true)."</pre>";
 	}
 	function templateTest() {
