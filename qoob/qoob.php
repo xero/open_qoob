@@ -185,7 +185,7 @@ class qoob {
     	library::set('QOOB.url', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
     	library::set('QOOB.domain', 'http://'.dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"]));
     	library::set('REQUEST.verb', $_SERVER['REQUEST_METHOD']);
-    	library::set('REQUEST.uri', rtrim(str_replace(library::get('QOOB.domain'), '', library::get('QOOB.url')), '/'));
+		library::set('REQUEST.uri', rtrim(str_replace('?'.$_SERVER['QUERY_STRING'], '', str_replace(library::get('QOOB.domain'), '', library::get('QOOB.url'))), '/'));
     	library::set('REQUEST.ajax', (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])&&strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest')?'AJAX':'SYNC');
     	$found = false;
 		foreach(library::get('ROUTES') as  $route) {
