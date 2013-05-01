@@ -295,11 +295,11 @@ if you want just a count of rows effected by your query set the 4th parameter to
       false, //dont return results
       true   //count rows
     );
-    return $qoob->mysql->num_rows();
+    $count = $qoob->mysql->num_rows();
 ```
 
 ###auto-sanitization
 there are currently three methods of sanitization applied to each variable. 
-- __stripslashes__ - only called if magic quotes is enabled (legacy compatability)
+- __stripslashes__ - only called if magic quotes are enabled (legacy compatability)
 - __asciiOnly__ - depending on the value of the `asciiOnly` class variable, all non-printable characters are removed. by default only ascii characters are allowed, if you need to support special/international characters (e.g. ñ, ½, etc) change the value to false.
 - __mysql_real_escape_string__ - uses the db server's internal sql injection protection routines.
