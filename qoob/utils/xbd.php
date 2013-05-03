@@ -202,7 +202,11 @@ class xbd {
 			
 			return $s_browser;
 		}
-		$addr = $_SERVER['REMOTE_ADDR'];
+		if(getenv('HTTP_X_FORWARDED_FOR') != '') {
+		    $addr = getenv('HTTP_X_FORWARDED_FOR');
+		} else {
+		    $addr = getenv('REMOTE_ADDR');
+		}
 		$host = @gethostbyaddr($addr);
 		if($host == '') {
 			$host = "unknown";
