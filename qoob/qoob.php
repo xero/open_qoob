@@ -369,7 +369,16 @@ class qoob {
 			)
 		);
 		spl_autoload_extensions(".php,.inc");
-		spl_autoload_register();
+		spl_autoload_register(function($class) {
+			$parts = explode('\\', $class);
+			//support non-namespaced classes
+			$parts[] = str_replace('_', DIRECTORY_SEPARATOR, array_pop($parts));
+			$path = implode(DIRECTORY_SEPARATOR, $parts);
+			$file = stream_resolve_include_path($path.'.php');
+			if($file !== false) {
+				require $file;
+			}
+		});
 		library::set('STATUS.code', 200);
 		library::set('UI.dir', realpath('ui'));
 		library::set('TMP.dir', realpath('tmp'));
