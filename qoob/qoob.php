@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.1
+ * @version 	2.0.2
  */
 class qoob {
 	/**
@@ -36,10 +36,10 @@ class qoob {
 	 * @see http://www.rfc-editor.org/rfc/rfc2616.txt 
 	 */
 	const
-		//--- informational
+		// informational
 		HTTP_100='Continue',
 		HTTP_101='Switching Protocols',
-		//--- successful
+		// successful
 		HTTP_200='OK',
 		HTTP_201='Created',
 		HTTP_202='Accepted',
@@ -47,7 +47,7 @@ class qoob {
 		HTTP_204='No Content',
 		HTTP_205='Reset Content',
 		HTTP_206='Partial Content',
-		//--- redirection
+		// redirection
 		HTTP_300='Multiple Choices',
 		HTTP_301='Moved Permanently',
 		HTTP_302='Found',
@@ -55,7 +55,7 @@ class qoob {
 		HTTP_304='Not Modified',
 		HTTP_305='Use Proxy',
 		HTTP_307='Temporary Redirect',
-		//--- client error
+		// client error
 		HTTP_400='Bad Request',
 		HTTP_401='Unauthorized',
 		HTTP_402='Payment Required',
@@ -74,7 +74,7 @@ class qoob {
 		HTTP_415='Unsupported Media Type',
 		HTTP_416='Requested Range Not Satisfiable',
 		HTTP_417='Exception Failed',
-		//--- server error
+		// server error
 		HTTP_500='Internal Server Error',
 		HTTP_501='Not Implemented',
 		HTTP_502='Bad Gateway',
@@ -128,7 +128,7 @@ class qoob {
 	 * @param string $class class name
 	 */
 	function load($class) {
-		//nullbyte poisoning check
+		// nullbyte poisoning check
 		$class = str_replace(chr(0), '', $class);
 		if(class_exists($class)) {
 			// remove namespace from class name
@@ -203,7 +203,7 @@ class qoob {
 					for($i=0;$i<count($names[0]);$i++) {
 						$args[str_replace('\:', '', $names[0][$i])] = isset($matches[$i])?$matches[$i]:'';
 					}
-					//get and merge request and uri arguments
+					// get and merge request and uri arguments
 					$requests = $this->parseRequest(library::get('REQUEST.verb'));
 					$args = array_merge_recursive($requests, $args);
 					break;					
@@ -225,11 +225,11 @@ class qoob {
 	 */
 	function call($route, $args) {
 		$this->benchmark->mark('callStart');
-		//closure style
+		// closure style
 		if(is_callable($route['handler'])) {
 			call_user_func_array($route['handler'], array($args));
 		}
-		//class creation
+		// class creation
 		if(is_string($route['handler']) && preg_match('/(.+)\h*(->|::)\h*(.+)/s', $route['handler'], $parts)) {
 			if (!class_exists($parts[1]) || !method_exists($parts[1], $parts[3])) {
 				throw new Exception(self::HTTP_404, 404);
@@ -322,8 +322,10 @@ class qoob {
 	 * @param array $ctx error context
 	 */	
 	function error_handler($num, $str, $file, $line, $ctx=array()) {
-		//remove php error output
-		@ob_end_clean();
+		// remove php error output
+		if(ob_get_length()>0){ 
+			@ob_end_clean();
+		}
 		$code = $this->status($num);
 		$this->logz->changeFile('error.log');
 		$this->logz->write('error: '.$num.' - '.$str.' [file] '.$file.' [line] '.$line.' [context] '.trim(preg_replace('/\s+/', ' ', print_r($ctx, true))));
