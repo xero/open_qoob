@@ -100,10 +100,10 @@ class logz {
 	 * @return string ipaddress
 	 */
 	function getIP() {
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARTDED_FOR'] != '') {
-		    return $_SERVER['HTTP_X_FORWARDED_FOR'];
+		if(getenv('HTTP_X_FORWARDED_FOR') != '') {
+		    return getenv('HTTP_X_FORWARDED_FOR');
 		} else {
-		    return $_SERVER['REMOTE_ADDR'];
+		    return getenv('REMOTE_ADDR');
 		}
 	}
 	/**
