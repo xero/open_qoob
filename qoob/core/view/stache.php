@@ -31,7 +31,7 @@ class stache {
 	 * @param array $data name value pairs to replace in the template file
 	 * @param boolean $return auto echo on false, return string on true (default = false)
 	 */
-	public function render($view, $data, $return = false) {
+	public function render($view, $data = array(), $return = false) {
 		$file = \library::get('UI.dir').DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$view.".html";
 		if(file_exists($file)) {
 			ob_start();
