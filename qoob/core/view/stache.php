@@ -13,7 +13,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.33
+ * @version 	2.34
  */
 namespace qoob\core\view;
 class stache {

@@ -211,6 +211,11 @@ here's an example:
       )
     );    
 ```
+you can also use templates with no replacements
+```php5
+    $qoob->load('qoob\core\view\stache');
+    $qoob->stache->render('templateFileName');    
+```
 ###creating a template
 creating stache templates are simple, you replace any dynamic value with a mustache variable! but templates are not limited to html. they could be emails, xml, excel, or any other type of text file.
 
