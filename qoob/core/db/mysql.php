@@ -6,7 +6,7 @@
  * @author      xero harrison <x@xero.nu>
  * @copyright   creative commons attribution-shareAlike 3.0 unported
  * @license     http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version     2.42
+ * @version     2.5
  */
 namespace qoob\core\db;
 class mysql {
@@ -146,7 +146,12 @@ class mysql {
         }
         $this->sql = preg_replace($find, $replace, $sql);
         $query = new mysqlQuery($this->sql, $this->db);
-        $this->count = $count ? $query->num_rows() : 0;
+        $isSelect = strrpos(strtolower($this->sql), 'select');
+        if($isSelect===false) {
+            $this->count = $count ? $query->affected_rows() : 0;
+        } else {
+            $this->count = $count ? $query->num_rows() : 0;
+        }
         if($results) {
             return $query->result();
         } else {
@@ -215,12 +220,22 @@ class mysqlQuery {
     /**
      * number of rows
      * returns the number of rows in a given result
-     * 
+     *
      * @return int
      */
     public function num_rows() {
         return @mysql_num_rows($this->result);
-    }    /**
+    }
+    /**
+     * number of affected rows
+     * returns the number of rows affected by the previous sql query
+     *
+     * @return int
+     */
+    public function affected_rows() {
+        return @mysql_affected_rows();
+    }
+    /**
      * destructor
      * call's free result only if one has been created
      */
