@@ -146,11 +146,10 @@ class mysql {
         }
         $this->sql = preg_replace($find, $replace, $sql);
         $query = new mysqlQuery($this->sql, $this->db);
-        $isSelect = strrpos(strtolower($this->sql), 'select');
-        if($isSelect===false) {
-            $this->count = $count ? $query->affected_rows() : 0;
-        } else {
+        if(substr(trim((strtolower($this->sql))), 0, 6) === 'select') {
             $this->count = $count ? $query->num_rows() : 0;
+        } else {
+            $this->count = $count ? $query->affected_rows() : 0;
         }
         if($results) {
             return $query->result();
