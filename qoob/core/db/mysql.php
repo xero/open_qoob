@@ -125,6 +125,7 @@ class mysql {
             $string = stripslashes($string);
         }
         $filtered = $this->asciiOnly ? trim(preg_replace('/[^\x0A\x0D\x20-\x7E]/', '', $string)) : trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $string));
+        $filtered = str_replace('$', '$\0', $filtered);
         return mysql_real_escape_string($filtered);
     }
     /**
