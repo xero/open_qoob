@@ -24,6 +24,9 @@ $qoob->route('GET /home [ajax]', 'request_types->ajax');
 $qoob->route('GET /model', 'app\test->modelTest');
 // view test
 $qoob->route('GET /template', 'app\test->templateTest');
+//error test
+$qoob->route('GET /error', 'app\test->errorTrap');
+$qoob->route('GET /error/:type', 'app\test->errorTrap');
 //______________________________________________________________________________
 //                                                                       execute
 $qoob->run();

@@ -8,6 +8,33 @@ class test {
 		$this->qoob = \qoob::open();
 	}
 
+	function errorTrap($args) {
+		if(!isset($args['type'])) {
+			$args['type'] = '';
+		}
+		switch ($args['type']) {
+			case 'thrown':
+				throw new \Exception("Error Thrown Manually.", 500);
+			break;
+			case 'math':
+				$err = 806 / 0;
+			break;
+			case 'nonexistant':
+				\someNonExistantFunction();
+			break;
+			case 'loading':
+				$this->qoob->load('somethingFake');
+			break;
+			case 'new':
+				$x = new FakeClass();
+			break;
+			default:
+				$url = \library::get('QOOB.domain').'/error/';
+				echo '<h3>Error Tests</h3><ul><li><a href="'.$url.'thrown">thrown errors</a></li><li><a href="'.$url.'math">arithmetic errors</a></li><li><a href="'.$url.'nonexistant">nonexistant call errors</a></li><li><a href="'.$url.'loading">loading errors</a></li><li><a href="'.$url.'new">creation errors</a></li></ul>';
+			break;
+		}
+	}
+
 	function blah() {
 		echo "<h1>open qoob</h1><p>blah test method.</p>";
 	}

@@ -329,7 +329,7 @@ class qoob {
 		$code = $this->status($num);
 		$this->logz->changeFile('error.log');
 		$this->logz->write('error: '.$num.' - '.$str.' [file] '.$file.' [line] '.$line.' [context] '.trim(preg_replace('/\s+/', ' ', print_r($ctx, true))));
-		$this->stats->mine();
+		//$this->stats->mine();
 		if(library::get('CONFIG.debug')==true) {
 			die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>'.$str.'<br/><strong>file:</strong> '.$file.'<br/><strong>line:</strong> '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
 		} else {
@@ -355,21 +355,9 @@ class qoob {
 	private function __clone() {}
 	/**
 	 * constructor
-	 * bootstraps the framework/core utils. setup error handling. initializes autoloading classes. set default variables.
+	 * bootstraps the framework/core utils. initializes autoloading classes. set default variables.
 	 */
 	private function __construct() {
-		set_error_handler(array(&$this, 'error_handler'));
-		set_exception_handler(array(&$this, 'exception_handler'));
-		register_shutdown_function(array(&$this, 'fatal_handler'));
-		set_include_path(
-			implode(
-				PATH_SEPARATOR, 
-				array(
-					get_include_path(), 
-					basename(__DIR__).DIRECTORY_SEPARATOR.'app'
-				)
-			)
-		);
 		spl_autoload_extensions(".php,.inc");
 		spl_autoload_register(function($class) {
 			$parts = explode('\\', $class);
@@ -440,7 +428,12 @@ final class library {
 //_________________________________________________________________________
 //                                                            open the qoob
 /**
+ * setup global error handling
  * @return class qoob instance
  */
-return qoob::open();
+$qoob = qoob::open();
+set_error_handler(array(&$qoob, 'error_handler'));
+set_exception_handler(array(&$qoob, 'exception_handler'));
+register_shutdown_function(array(&$qoob, 'fatal_handler'));
+return $qoob;
 ?>
