@@ -182,7 +182,9 @@ class mysql {
      */
     public function __destruct() {
         if(!$this->keepAlive) {
-            @mysql_close($this->db);
+            if (isset($this->db) && is_resource($this->db)) {
+                @mysql_close($this->db);
+            }
         }
     }
 }
