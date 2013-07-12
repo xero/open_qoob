@@ -2,8 +2,7 @@ open qoob framework
 -------------------
 the qoob is a semi-RESTful php api framework designed to simplify and expedite the process of creating dynamic web applications.
 
-### THE QOOB IS CURRENTLY UNDER ACTIVE DEVELOPMENT AND IS SUPER BETA! 
-### THINGS WILL BE CHANGING SO USE AT YOUR OWN RISK!
+### THE QOOB IS CURRENTLY UNDER ACTIVE DEVELOPMENT AND IS BETA! 
 
 ```text
                            MM.                                                   
@@ -46,6 +45,8 @@ the qoob is a semi-RESTful php api framework designed to simplify and expedite t
 this is actually version 2.x of the open qoob framework and is a complete rewrite from the ground up. if you're looking for the legacy versions, they are archived here: 
  - Framework: http://github.com/xero/open_qoob_legacy/ 
  - CMS: http://github.com/xero/open_qoob_cms_legacy/
+
+follow [@openqoob](http://twitter.com/openqoob) for updates via social media
 
 ##requirements
  - PHP 5.1.2

@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.0.2
+ * @version 	2.0.22
  */
 class qoob {
 	/**
@@ -358,15 +358,21 @@ class qoob {
 	 * bootstraps the framework/core utils. initializes autoloading classes. set default variables.
 	 */
 	private function __construct() {
+		//support non-namespaced classes
+		set_include_path(
+			implode(
+				PATH_SEPARATOR, 
+				array(
+					get_include_path(), 
+					basename(__DIR__).DIRECTORY_SEPARATOR.'app'
+				)
+			)
+		);
 		spl_autoload_extensions(".php,.inc");
-		spl_autoload_register(function($class) {
-			$parts = explode('\\', $class);
-			//support non-namespaced classes
-			$parts[] = str_replace('_', DIRECTORY_SEPARATOR, array_pop($parts));
-			$path = implode(DIRECTORY_SEPARATOR, $parts);
-			$file = stream_resolve_include_path($path.'.php');
-			if($file !== false) {
-				require $file;
+		spl_autoload_register(function($class) {			
+			$class = (string) str_replace('\\', DIRECTORY_SEPARATOR, $class);
+			if(stream_resolve_include_path($class.'.php') !== false) {
+				require $class.'.php';
 			}
 		});
 		library::set('STATUS.code', 200);
