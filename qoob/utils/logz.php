@@ -6,7 +6,7 @@
  * @author 		xero harrison / http://xero.nu
  * @copyright 	creative commons attribution-shareAlike 3.0 Unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	1.42
+ * @version 	1.42.01
  * @package		qoob
  * @subpackage	utils 
  */
@@ -20,6 +20,17 @@ class logz {
 	 * @var logs directory
 	 */
 	protected $dir;
+
+	/**
+	 * constructor
+	 * set default path and file
+	 */
+	function __construct() {
+		$this->setup(
+			\library::get('TMP.dir'), 
+			'error.log'
+		);
+	}
 	/**
 	 * set directory and filename
 	 *

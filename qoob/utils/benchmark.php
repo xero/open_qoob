@@ -6,7 +6,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	1.03
+ * @version 	1.03.01
  * @package		qoob
  * @subpackage	utils
  */
@@ -16,6 +16,13 @@ class benchmark {
 	 * @var array $markers the points in time that are benchmarked
 	 */
 	var $markers = array();
+	/**
+	 * constructor
+	 * mark app start
+	 */
+	function __construct() {
+		$this->mark('appStart');
+	}
 	/**
 	 * set marker
 	 * save a moment in time by a name
