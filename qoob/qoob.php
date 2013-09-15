@@ -186,7 +186,9 @@ class qoob {
 	 * mine the current request against the routes in the library
 	 */
 	function parseRoutes() {
-		$this->benchmark->mark('parseStart');
+		if(isset($this->benchmark)) {
+			$this->benchmark->mark('parseStart');
+		}
     	library::set('QOOB.url', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
     	library::set('QOOB.domain', 'http://'.dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"]));
     	library::set('REQUEST.verb', $_SERVER['REQUEST_METHOD']);
@@ -215,7 +217,9 @@ class qoob {
 				}
 			}
 		}
-		$this->benchmark->mark('parseEnd');		
+		if(isset($this->benchmark)) {
+			$this->benchmark->mark('parseEnd');
+		}
 		if(!$found) {
 			throw new Exception(self::HTTP_404, 404);
 		} else {
@@ -229,7 +233,9 @@ class qoob {
 	 * @param array $args url arguments
 	 */
 	function call($route, $args) {
-		$this->benchmark->mark('callStart');
+		if(isset($this->benchmark)) {
+			$this->benchmark->mark('callStart');
+		}
 		// closure style
 		if(is_callable($route['handler'])) {
 			call_user_func_array($route['handler'], array($args));
@@ -241,7 +247,9 @@ class qoob {
 			}
 			call_user_func_array(array(new $parts[1], $parts[3]), array($args));
 		}
-		$this->benchmark->mark('callEnd');
+		if(isset($this->benchmark)) {
+			$this->benchmark->mark('callEnd');
+		}
 	}
 	/**
 	 * parse request
