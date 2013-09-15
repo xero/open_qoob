@@ -117,6 +117,15 @@ $this->benchmark->mark('name');
 ```
 **note:** the load method will strip off the namespace and create a public variable from the name of the class only.
 
+you can also autoload classes when in the config file is loaded. simply add the namespace and class as a value of the autoload config array.
+
+here's an example of loading the benchmark and logz utility classes via the config file:
+```php
+[autoload]
+benchmark="qoob\utils\benchmark"
+logz="qoob\utils\logz"
+```
+
 ##routing
 the qoob has it's own routing system. routes map urls and requests to either anonymous functions or class methods.
 ###closure style callbacks 

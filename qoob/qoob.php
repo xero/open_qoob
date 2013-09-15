@@ -103,7 +103,6 @@ class qoob {
 	/**
 	 * config
 	 * parse a php ini into the library. autoload classes if defined.
-	 *
 	 * @param string $file file name
 	 */
 	function config($file) {
@@ -247,7 +246,6 @@ class qoob {
 	/**
 	 * parse request
 	 * gets request arguments from the correct protocol for the given http verb
-	 *
 	 * @param string $verb the http verb
 	 */
 	function parseRequest($verb) {
@@ -304,7 +302,6 @@ class qoob {
 	/**
 	 * exception handler
 	 * gracefully respond to exceptions.
-	 *
 	 * @param object $exc the php exception object
 	 */
 	function exception_handler($exc) {
@@ -319,7 +316,6 @@ class qoob {
 	/**
 	 * error handler
 	 * gracefully respond to errors
-	 *
 	 * @param int $num error code
 	 * @param string $str error message
 	 * @param string $file the file throwing the error
