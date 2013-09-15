@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.0.22
+ * @version 	2.01.00
  */
 class qoob {
 	/**
@@ -102,7 +102,8 @@ class qoob {
 	}
 	/**
 	 * config
-	 * parse a php ini into the library
+	 * parse a php ini into the library. autoload classes if defined.
+	 *
 	 * @param string $file file name
 	 */
 	function config($file) {
@@ -113,9 +114,14 @@ class qoob {
 		if(count($ini)>0) {
 			foreach ($ini as $key => $val) {
 				if(is_array($val)) {
+					if(strtolower($key)=='autoload') {
+						foreach ($val as $k => $v) {
+							$this->load($v);
+						}
+					}
 					foreach ($val as $k => $v) {
 						library::set('CONFIG.'.strtoupper($key).'.'.$k, $v);
-					}
+					}						
 				} else {
 					library::set('CONFIG.'.$key, $val);
 				}
@@ -267,7 +273,6 @@ class qoob {
 	 */
 	function run() {
 		$this->parseRoutes();
-		$this->stats->mine();
 	}
 	/**
 	 * split
@@ -327,13 +332,14 @@ class qoob {
 			@ob_end_clean();
 		}
 		$code = $this->status($num);
-		$this->logz->changeFile('error.log');
-		$this->logz->write('error: '.$num.' - '.$str.' [file] '.$file.' [line] '.$line.' [context] '.trim(preg_replace('/\s+/', ' ', print_r($ctx, true))));
-		//$this->stats->mine();
+		if(isset($this->logz)) {
+			$this->logz->changeFile('error.log');
+			$this->logz->write('error: '.$num.' - '.$str.' [file] '.$file.' [line] '.$line.' [context] '.trim(preg_replace('/\s+/', ' ', print_r($ctx, true))));			
+		}
 		if(library::get('CONFIG.debug')==true) {
-			die('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>'.$str.'<br/><strong>file:</strong> '.$file.'<br/><strong>line:</strong> '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
+			echo('<h1>open qoob</h1><h3>error: '.$num.'!</h3><p>'.$str.'<br/><strong>file:</strong> '.$file.'<br/><strong>line:</strong> '.$line.'</p><pre>'.print_r($ctx, true).'</pre>');
 		} else {
-			die('<h1>open qoob</h1><h3>error: '.$code.'</h3>');
+			echo('<h1>open qoob</h1><h3>error: '.$code.'!</h3>');
 		}
 	}
 	/**
@@ -379,27 +385,27 @@ class qoob {
 		library::set('UI.dir', realpath('ui'));
 		library::set('TMP.dir', realpath('tmp'));
 		library::set('CONFIG.debug', false);
-		$this->load('qoob\utils\benchmark');
-		$this->benchmark->mark('appStart');
-		$this->load('qoob\utils\logz');
-		$this->logz->setup(realpath('tmp'), 'error.log');
-		$this->load('qoob\utils\stats');
 	}
 	/**
 	 * destructor
 	 * calculate the benchmarks
 	 */
 	public function __destruct() {
-		if(library::get('CONFIG.debug')==true) {
+		if(isset($this->benchmark)) {
+			$markers = array();
 			foreach ($this->benchmark->markers as $key => $value) {
 				if(strpos($key, 'Start')>0) {
 					$mark = substr($key, 0, strpos($key, 'Start'));
 					$markers[$mark] = ($x=$this->benchmark->diff($mark.'Start', $mark.'End'))==false?('did not run'):($x.' seconds');
 				}
 			}
-			echo str_replace('Array', 'benchmarks', '<pre style="border:1px solid #333;background:#ccc;padding:20px">'.print_r($markers, true).'</pre>');
-			$this->logz->changeFile('benchmark.log');
-			$this->logz->write(json_encode($markers));
+			if(isset($this->logz)) {
+				$this->logz->changeFile('benchmark.log');
+				$this->logz->write(json_encode($markers));
+			}
+			if(library::get('CONFIG.debug')==true) {
+				echo str_replace('Array', 'benchmarks', '<pre style="border:1px solid #333;background:#ccc;padding:20px">'.print_r($markers, true).'</pre>');
+			}
 		}
 	}
 }
@@ -412,15 +418,18 @@ class qoob {
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.22
+ * @version 	2.22.01
  */
 final class library {
 	private static $catalog;
+	static function expose() {
+		return print_r(self::$catalog, true);
+	}
 	static function exists($key) {
 		return isset(self::$catalog[$key]);
 	}
 	static function get($key) {
-		return self::$catalog[$key];
+		return isset(self::$catalog[$key]) ? self::$catalog[$key] : false;
 	}
 	static function set($key, $value) {
 		is_array($value) ? self::$catalog[$key][]=$value : self::$catalog[$key]=$value;

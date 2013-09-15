@@ -14,3 +14,8 @@ host='localhost'
 name='qoob'
 user='root'
 pass=''
+
+[autoload]
+logz='qoob\utils\logz'
+stats='qoob\utils\stats'
+benchmark='qoob\utils\benchmark'
