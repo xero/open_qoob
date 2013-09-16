@@ -9,6 +9,12 @@
  */
 class qoob {
 	/**
+	 * famework info
+	 */
+	const 
+		PACKAGE='open qoob',
+		VERSION='2.01.00';
+	/**
 	 * error constants
 	 */
 	const
@@ -96,6 +102,7 @@ class qoob {
 		// no commandline headers
 		if (PHP_SAPI!='cli') {
 			header('HTTP/1.1 '.$code);
+			header('X-Powered-By: '.self::PACKAGE.'/'.self::VERSION);
 		}
 		library::set('STATUS.code', $code);
 		return @constant('self::HTTP_'.$code);
@@ -156,7 +163,7 @@ class qoob {
 	 */
 	function route($pattern, $handler) {
 		if(empty($handler)) {
-			throw new Exception($self::E_Handler, 500);
+			throw new Exception(self::E_Handler, 500);
 		}
 		$parts = explode(' ', trim($pattern));
 		foreach ($this->split($parts[0]) as $verb) {
