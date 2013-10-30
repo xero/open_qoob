@@ -6,7 +6,7 @@
  * @author      xero harrison <x@xero.nu>
  * @copyright   creative commons attribution-shareAlike 3.0 unported
  * @license     http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version     2.5
+ * @version     2.05.02
  */
 namespace qoob\core\db;
 class mysql {
@@ -124,9 +124,8 @@ class mysql {
         if(get_magic_quotes_gpc()) {
             $string = stripslashes($string);
         }
-        $filtered = $this->asciiOnly ? trim(preg_replace('/[^\x0A\x0D\x20-\x7E]/', '', $string)) : trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $string));
-        $filtered = str_replace('$', '$\0', $filtered);
-        return mysql_real_escape_string($filtered);
+        $filtered = trim($this->asciiOnly ? preg_replace('/[^\x0A\x0D\x20-\x7E]/', '', $string) : preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $string));
+        return mysql_real_escape_string(str_replace('$', '$\\', $filtered));
     }
     /**
      * SQL query function
