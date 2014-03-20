@@ -29,7 +29,7 @@ class qoob_core extends qoobTest {
 		$q = $this->qoob;
 		$this->assertEquals(
 			$q::VERSION, 
-			'2.02.02'
+			'2.01.01'
 		);
 	}
 	/**

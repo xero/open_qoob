@@ -247,7 +247,7 @@ class qoob_routes extends qoobTest {
 			'GET',
 			''
 		);
-		$this->expectOutputString('{"error":2,"message":"Division by zero"}');
+		$this->expectOutputString('<h1>open qoob</h1><h3>error: Internal Server Error!</h3>');
 		$this->qoob->run();
 	}
 	/**
@@ -265,7 +265,7 @@ class qoob_routes extends qoobTest {
 			'GET',
 			''
 		);
-		$this->expectOutputString('{"error":256,"message":"Fatal error"}');
+		$this->expectOutputString('<h1>open qoob</h1><h3>error: Internal Server Error!</h3>');
 		$this->qoob->run();
 	}
 

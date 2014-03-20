@@ -4,6 +4,11 @@ the qoob is a semi-RESTful php api framework designed to simplify and expedite t
 
 ### THE QOOB IS CURRENTLY UNDER ACTIVE DEVELOPMENT AND IS BETA! 
 
+magnum-ci build status:
+
+![build status](https://magnum-ci.com/status/e9e355164ebbbd4ecc95b89d8f4cc4cb.png)
+
+
 ```text
                            MM.                                                   
                            MNNNN.                                                

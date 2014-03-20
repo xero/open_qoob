@@ -5,7 +5,7 @@
  * @author 		xero harrison <x@xero.nu>
  * @copyright 	creative commons attribution-shareAlike 3.0 unported
  * @license 	http://creativecommons.org/licenses/by-sa/3.0/ 
- * @version 	2.01.00
+ * @version 	2.01.01
  */
 class qoob {
 	/**
@@ -13,7 +13,7 @@ class qoob {
 	 */
 	const 
 		PACKAGE='open qoob',
-		VERSION='2.01.00';
+		VERSION='2.01.01';
 	/**
 	 * error constants
 	 */
@@ -23,7 +23,7 @@ class qoob {
 		E_Fatal='Fatal error: %s',
 		E_Open='Unable to open: %s',
 		E_Loading='Failed loading: %s',
-		E_Request='Invalid reqest type: %s',
+		E_Request='Invalid request type: %s',
 		E_Routes='No routes specified',
 		E_Method='Invalid method: %s',
 		E_Gateway='Not implemented: %s';
