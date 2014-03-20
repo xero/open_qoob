@@ -1,6 +1,6 @@
 ;<?php exit(); __halt_compiler();
 
-debug=true
+debug=false
 
 [general]
 author='xero harrison'
@@ -16,6 +16,6 @@ user='root'
 pass=''
 
 [autoload]
-logz='qoob\utils\logz'
-stats='qoob\utils\stats'
-benchmark='qoob\utils\benchmark'
+;logz='qoob\utils\logz'
+;stats='qoob\utils\stats'
+;benchmark='qoob\utils\benchmark'
