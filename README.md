@@ -258,7 +258,7 @@ there are five types of mustaches that the qoob currently supports:
 **note:** any non-required variable will be replaced with an empty string if not set by the render function.
 
 ##databases
-the qoob currently only supports mysql databases. while it's possible to use the mysql adapter in any class, IMHO using models makes the most sence. to create a model simply create a class that extends the mysql class: `\qoob\core\db\mysql`. add your connection variables in the class constructor then connect. after that all functions of the model will be ready to execute queries. 
+the qoob currently only supports mysql databases. while it's possible to use the mysql/mysqli adapter in any class, IMHO using models makes the most sence. to create a model simply create a class that extends one of the mysql classes: `\qoob\core\db\mysql` or `\qoob\core\db\mysqli`. add your connection variables in the class constructor then connect. after that all functions of the model will be ready to execute queries. 
 
 ###connecting to a db server
 there are two methods necessary to connect to a mysql database, `init` and `connect`.
