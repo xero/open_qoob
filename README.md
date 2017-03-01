@@ -2,8 +2,6 @@ open qoob framework
 -------------------
 the qoob is a semi-RESTful php api framework designed to simplify and expedite the process of creating dynamic web applications.
 
-### THE QOOB IS CURRENTLY UNDER ACTIVE DEVELOPMENT AND IS BETA! 
-
 ```text
                            MM.                                                   
                            MNNNN.                                                
